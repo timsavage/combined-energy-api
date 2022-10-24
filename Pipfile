@@ -1,0 +1,9 @@
+[dev-packages]
+pytest = "*"
+pytest-cov = "*"
+
+[packages]
+combined-energy-api = {path = "."}
+
+[requires]
+python_version = "3.8"

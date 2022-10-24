@@ -16,6 +16,8 @@ from .models import (
     ConnectionHistory,
     InstallationCustomers,
     Installation,
+    Customer,
+    CurrentUser,
 )
 
 USER_ACCESS_HOST = "https://onwatch.combined.energy"
@@ -25,7 +27,7 @@ DATA_ACCESS_HOST = "https://ds20.combined.energy/data-service"
 @dataclass
 class CombinedEnergy:
     jwt: str
-    # installation_id: int
+    installation_id: int
 
     request_timeout: float = 8.0
     session: Optional[ClientSession] = None
@@ -86,7 +88,7 @@ class CombinedEnergy:
 
     async def user(
         self,
-    ) -> Installation:
+    ) -> CurrentUser:
         """
         Get details of current user
 
@@ -94,44 +96,35 @@ class CombinedEnergy:
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/user",
         )
-        return data
-        # return Installation.parse_obj(data)
+        return CurrentUser.parse_obj(data)
 
     async def installation(
         self,
-        install_id: int,
     ) -> Installation:
         """
         Get details of installation
-
-        :param install_id: System installation ID
-
         """
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/installation",
-            i=install_id,
+            i=self.installation_id,
         )
         return Installation.parse_obj(data)
 
     async def installation_customers(
         self,
-        install_id: int,
     ) -> InstallationCustomers:
         """
         Get list of customers associated with an installation
 
-        :param install_id: System installation ID
-
         """
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/inst-customers",
-            i=install_id,
+            i=self.installation_id,
         )
         return InstallationCustomers.parse_obj(data)
 
     async def readings(
         self,
-        install_id: int,
         range_start: datetime.datetime,
         range_end: Optional[datetime.datetime],
         seconds: int,
@@ -139,14 +132,13 @@ class CombinedEnergy:
         """
         Get readings from system
 
-        :param install_id: System installation ID
         :param range_start: Start of readings range
         :param range_end: End of readings range
         :param seconds: Sample increment size
         """
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/readings",
-            i=install_id,
+            i=self.installation_id,
             rangeStart=int(range_start.timestamp()),
             rangeEnd=int(range_end.timestamp()) if range_end else "",
             seconds=seconds,
@@ -155,49 +147,48 @@ class CombinedEnergy:
         return data
 
     async def last_readings(
-        self, install_id: int, delta: datetime.timedelta, seconds: int
+        self,
+        delta: datetime.timedelta,
+        seconds: int,
     ):
         """
         Get readings for the last delta range.
 
-        :param install_id: System installation ID
         :param delta: Timezone delta to read data from (positive)
         :param seconds: Sample increment size
         """
         now = datetime.datetime.now()
-        return await self.readings(install_id, now - delta, None, seconds)
+        return await self.readings(now - delta, None, seconds)
 
     # getPerformanceSummary: dataHost + "/dataAccess/performance-summary",
     # getTariffOptions: dataHost + "/dataAccess/tariff-options",
     # getTariffDetails: dataHost + "/dataAccess/tariff-details",
-    async def communication_status(self, install_id: int) -> ConnectionStatus:
+
+    async def communication_status(self) -> ConnectionStatus:
         """
         Get communication status of the installation
         """
         data = await self._request(
-            DATA_ACCESS_HOST + "/dataAccess/comm-stat", i=install_id
+            DATA_ACCESS_HOST + "/dataAccess/comm-stat",
+            i=self.installation_id,
         )
         return ConnectionStatus.parse_obj(data)
 
-    async def communication_history(self, install_id: int) -> ConnectionHistory:
+    async def communication_history(self) -> ConnectionHistory:
         """
         Get communication history of the installation
         """
         data = await self._request(
-            DATA_ACCESS_HOST + "/dataAccess/comm-hist", i=install_id
+            DATA_ACCESS_HOST + "/dataAccess/comm-hist",
+            i=self.installation_id,
         )
         return ConnectionHistory.parse_obj(data)
 
-    #
     # userAccessLogin: userAccessHost + "/user/Login",
     # userAccessChangePasswordRequest: userAccessHost + "/user/ChangePasswordRequest",
     # userAccessChangePassword: userAccessHost + "/user/ChangePassword",
     # userAccessCheckChangeKey: userAccessHost + "/user/CheckChangeKey",
     # userAccessResume: userAccessHost + "/user/Resume",
-    # userUpdatePreferences: userAccessHost + "/user/UpdatePreferences",
-    # userTariffSelect: userAccessHost + "/user/TariffSelect",
-    # userHelpRequest: userAccessHost + "/user/HelpRequest",
-    # userTariffQuery: userAccessHost + "/user/TariffQuery"
 
     async def close(self) -> None:
         """Close open client session."""

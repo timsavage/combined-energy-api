@@ -10,8 +10,26 @@ class CommonModel(BaseModel):
 
 
 class User(BaseModel):
+    """
+    Individual user
+    """
+
+    type: str
+    id: int
+    email: str
+    mobile: str
+    fullname: str
+    dsa_ok: bool = Field(alias="dsaOk")
+    show_introduction: Optional[str] = Field(alias="showIntroduction")
+
+
+class CurrentUser(BaseModel):
+    """
+    Current logged in user
+    """
+
     status: str
-    user
+    user: User
 
 
 class ConnectionStatus(CommonModel):

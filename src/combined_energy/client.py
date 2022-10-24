@@ -18,6 +18,7 @@ from .models import (
     Installation,
     Customer,
     CurrentUser,
+    Readings,
 )
 
 USER_ACCESS_HOST = "https://onwatch.combined.energy"
@@ -128,7 +129,7 @@ class CombinedEnergy:
         range_start: datetime.datetime,
         range_end: Optional[datetime.datetime],
         seconds: int,
-    ):
+    ) -> Readings:
         """
         Get readings from system
 
@@ -143,8 +144,7 @@ class CombinedEnergy:
             rangeEnd=int(range_end.timestamp()) if range_end else "",
             seconds=seconds,
         )
-        print(data)
-        return data
+        return Readings.parse_obj(data)
 
     async def last_readings(
         self,

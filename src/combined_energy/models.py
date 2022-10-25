@@ -1,7 +1,29 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Literal, Union
 
-from pydantic import BaseModel, validator, Field
+from pydantic import BaseModel, Field
+
+now = datetime.now
+
+
+class Login(BaseModel):
+    """
+    Response from Login
+    """
+
+    status: str
+    expire_minutes: int = Field(alias="expireMins")
+    jwt: str
+
+    # Capture time login was created
+    created: datetime = Field(default_factory=now)
+
+    def expires(self, expiry_window: int) -> datetime:
+        """
+        Calculate when this login expires
+        """
+        offset = timedelta(minutes=self.expire_minutes, seconds=-expiry_window)
+        return self.created + offset
 
 
 class CommonModel(BaseModel):
@@ -40,14 +62,6 @@ class ConnectionStatus(CommonModel):
     connected: bool
     since: datetime
 
-    @staticmethod
-    @validator(
-        "since",
-        pre=True,
-    )
-    def preparse_timestamp(value: int) -> datetime:
-        return datetime.fromtimestamp(value)
-
 
 class ConnectionHistoryEntry(BaseModel):
     """
@@ -59,14 +73,6 @@ class ConnectionHistoryEntry(BaseModel):
     device: str = Field(alias="d")
     s: str
 
-    @staticmethod
-    @validator(
-        "timestamp",
-        pre=True,
-    )
-    def preparse_timestamp(value: int) -> datetime:
-        return datetime.fromtimestamp(value)
-
 
 class ConnectionHistoryRoute(BaseModel):
     """
@@ -75,14 +81,6 @@ class ConnectionHistoryRoute(BaseModel):
 
     timestamp: datetime = Field(alias="t")
     device: str = Field(alias="d")
-
-    @staticmethod
-    @validator(
-        "timestamp",
-        pre=True,
-    )
-    def preparse_timestamp(value: int) -> datetime:
-        return datetime.fromtimestamp(value)
 
 
 class ConnectionHistory(CommonModel):
@@ -264,13 +262,3 @@ class Readings(BaseModel):
             DeviceReadingsGenericConsumer,
         ]
     ] = Field(descriminator="device_type")
-
-    @staticmethod
-    @validator(
-        "range_start",
-        "range_end",
-        "server_time",
-        pre=True,
-    )
-    def preparse_timestamp(value: int) -> datetime:
-        return datetime.fromtimestamp(value)

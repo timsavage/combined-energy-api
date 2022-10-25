@@ -1,0 +1,12 @@
+{
+  "status": "ok",
+  "user": {
+    "type": "Customer",
+    "id": 123,
+    "email": "dave@example.com",
+    "mobile": "+6155512345",
+    "fullname": "Dave Dobbs",
+    "dsaOk": false,
+    "showIntroduction": null
+  }
+}

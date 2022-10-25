@@ -1,0 +1,183 @@
+{
+  "installationId": 123,
+  "installationName": "My System",
+  "source": "a",
+  "role": "OWNER",
+  "readOnly": false,
+  "timezone": "Australia/NSW",
+  "dmgId": 18714,
+  "tags": [
+    "emu1",
+    "ems",
+    "dnsp-endeavour",
+    "tariff-flat",
+    "solar-generic",
+    "water-ps2",
+    "meter-pm2"
+  ],
+  "mqttAccountKura": "cet-ecn",
+  "mqttBrokerEms": "mqtt2.combined.energy",
+  "streetAddress": "54827 Blake Lane",
+  "locality": "Mitchellview",
+  "state": "TAS",
+  "postcode": "6339",
+  "status": "ACTIVE",
+  "reviewStatus": "VALIDATED",
+  "nmi": "123456789",
+  "phase": 1,
+  "orgId": 9999,
+  "tariffPlanId": 9999,
+  "tariffPlanAccepted": 1666579319338,
+  "devices": [
+    {
+      "deviceId": 2,
+      "refName": "WAT1",
+      "displayName": "Water Heater",
+      "deviceType": "WATER_HEATER",
+      "deviceManufacturer": "Rheem",
+      "deviceModelName": "PS2",
+      "supplierDevice": false,
+      "storageDevice": true,
+      "consumerDevice": true,
+      "status": "ACTIVE",
+      "maxPowerSupply": null,
+      "maxPowerConsumption": null,
+      "iconOverride": null,
+      "orderOverride": null,
+      "category": "WATER_HEATER"
+    },
+    {
+      "deviceId": 4,
+      "refName": "GRD1",
+      "displayName": "Grid Meter",
+      "deviceType": "GRID_METER",
+      "deviceManufacturer": "CET",
+      "deviceModelName": null,
+      "supplierDevice": true,
+      "storageDevice": false,
+      "consumerDevice": false,
+      "status": "ACTIVE",
+      "maxPowerSupply": null,
+      "maxPowerConsumption": null,
+      "iconOverride": null,
+      "orderOverride": null,
+      "category": "GRID_METER"
+    },
+    {
+      "deviceId": 5,
+      "refName": "EB1",
+      "displayName": "House",
+      "deviceType": "ENERGY_BALANCE",
+      "deviceManufacturer": "CET",
+      "deviceModelName": null,
+      "supplierDevice": false,
+      "storageDevice": false,
+      "consumerDevice": true,
+      "status": "ACTIVE",
+      "maxPowerSupply": null,
+      "maxPowerConsumption": null,
+      "iconOverride": null,
+      "orderOverride": null,
+      "actionDetails": null,
+      "category": "BUILDING"
+    },
+    {
+      "deviceId": 6,
+      "refName": "SOL1",
+      "displayName": "Solar",
+      "deviceType": "SOLAR_PV",
+      "deviceManufacturer": "GENERIC",
+      "deviceModelName": null,
+      "supplierDevice": true,
+      "storageDevice": false,
+      "consumerDevice": false,
+      "status": "ACTIVE",
+      "maxPowerSupply": null,
+      "maxPowerConsumption": null,
+      "iconOverride": null,
+      "orderOverride": null,
+      "actionDetails": null,
+      "category": "SOLAR_PV"
+    },
+    {
+      "deviceId": 7,
+      "refName": "SOL2",
+      "displayName": "Solar 2",
+      "deviceType": "SOLAR_PV",
+      "deviceManufacturer": "GENERIC",
+      "deviceModelName": null,
+      "supplierDevice": true,
+      "storageDevice": false,
+      "consumerDevice": false,
+      "status": "ACTIVE",
+      "maxPowerSupply": null,
+      "maxPowerConsumption": null,
+      "iconOverride": null,
+      "orderOverride": null,
+      "actionDetails": null,
+      "category": "SOLAR_PV"
+    },
+    {
+      "deviceId": 8,
+      "refName": "AC1",
+      "displayName": "Aircon",
+      "deviceType": "GENERIC_CONSUMER",
+      "deviceManufacturer": null,
+      "deviceModelName": null,
+      "supplierDevice": false,
+      "storageDevice": false,
+      "consumerDevice": true,
+      "status": "ACTIVE",
+      "maxPowerSupply": null,
+      "maxPowerConsumption": null,
+      "iconOverride": null,
+      "orderOverride": null,
+      "actionDetails": null,
+      "category": "AIRCON"
+    }
+  ],
+  "pm": {
+    "config": [
+      {
+        "name": "GRD1",
+        "channels": [
+          {
+            "ch": 3,
+            "ph": "A",
+            "rev": true
+          }
+        ]
+      },
+      {
+        "name": "SOL1",
+        "channels": [
+          {
+            "ch": 4,
+            "ph": "A",
+            "rev": true
+          }
+        ]
+      },
+      {
+        "name": "SOL2",
+        "channels": [
+          {
+            "ch": 5,
+            "ph": "A",
+            "rev": true
+          }
+        ]
+      },
+      {
+        "name": "AC1",
+        "channels": [
+          {
+            "ch": 1,
+            "ph": "A"
+          }
+        ]
+      }
+    ]
+  },
+  "brand": "solahart"
+}

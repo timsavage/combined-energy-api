@@ -1,0 +1,13 @@
+{
+  "status": "ok",
+  "installationId": 999998,
+  "customers": [
+    {
+      "customerId": 999999,
+      "phone": "+61713519723",
+      "email": "dave@example.com",
+      "name": "Dave Dobbs",
+      "primary": true
+    }
+  ]
+}

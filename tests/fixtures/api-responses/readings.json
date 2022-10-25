@@ -1,0 +1,421 @@
+{
+  "rangeStart": 1666583415,
+  "rangeEnd": 1666583425,
+  "rangeCount": 3,
+  "seconds": 5,
+  "installationId": 3696,
+  "serverTime": 1666583417,
+  "devices": [
+    {
+      "deviceType": "COMBINER",
+      "rangeStart": 1666583415,
+      "rangeEnd": 1666583425,
+      "timestamp": [
+        1666583415,
+        1666583420,
+        1666583425
+      ],
+      "sampleSecs": [
+        5,
+        5,
+        5
+      ],
+      "energySupplied": [
+        4.25806,
+        4.27417,
+        4.26028
+      ],
+      "energySuppliedSolar": [
+        0.66528,
+        0.66417,
+        0.66417
+      ],
+      "energySuppliedBattery": [
+        0,
+        0,
+        0
+      ],
+      "energySuppliedGrid": [
+        3.59278,
+        3.61,
+        3.59611
+      ],
+      "energyConsumedOther": [
+        4.24833,
+        4.26444,
+        4.25111
+      ],
+      "energyConsumedOtherSolar": [
+        0.66376,
+        0.66266,
+        0.66274
+      ],
+      "energyConsumedOtherBattery": [
+        0,
+        0,
+        0
+      ],
+      "energyConsumedOtherGrid": [
+        3.58457,
+        3.60179,
+        3.58837
+      ],
+      "energyConsumed": [
+        4.25806,
+        4.27417,
+        4.26028
+      ],
+      "energyConsumedSolar": [
+        0.66528,
+        0.66417,
+        0.66417
+      ],
+      "energyConsumedBattery": [
+        0,
+        0,
+        0
+      ],
+      "energyConsumedGrid": [
+        3.59278,
+        3.61,
+        3.59611
+      ],
+      "energyCorrection": [
+        0,
+        0,
+        0
+      ],
+      "temperature": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "deviceId": 6,
+      "deviceType": "SOLAR_PV",
+      "rangeStart": 1666583415,
+      "rangeEnd": 1666583425,
+      "timestamp": [
+        1666583415,
+        1666583420,
+        1666583425
+      ],
+      "sampleSecs": [
+        5,
+        5,
+        5
+      ],
+      "operationStatus": [
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE"
+      ],
+      "operationMessage": [
+        null,
+        null,
+        null
+      ],
+      "energySupplied": [
+        0.33333,
+        0.33222,
+        0.33222
+      ]
+    },
+    {
+      "deviceId": 7,
+      "deviceType": "SOLAR_PV",
+      "rangeStart": 1666583415,
+      "rangeEnd": 1666583425,
+      "timestamp": [
+        1666583415,
+        1666583420,
+        1666583425
+      ],
+      "sampleSecs": [
+        5,
+        5,
+        5
+      ],
+      "operationStatus": [
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE"
+      ],
+      "operationMessage": [
+        null,
+        null,
+        null
+      ],
+      "energySupplied": [
+        0.33194,
+        0.33194,
+        0.33194
+      ]
+    },
+    {
+      "deviceId": 4,
+      "deviceType": "GRID_METER",
+      "rangeStart": 1666583415,
+      "rangeEnd": 1666583425,
+      "timestamp": [
+        1666583415,
+        1666583420,
+        1666583425
+      ],
+      "sampleSecs": [
+        5,
+        5,
+        5
+      ],
+      "operationStatus": [
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE"
+      ],
+      "operationMessage": [
+        null,
+        null,
+        null
+      ],
+      "energyConsumed": [
+        0,
+        0,
+        0
+      ],
+      "energyConsumedSolar": [
+        0,
+        0,
+        0
+      ],
+      "energyConsumedBattery": [
+        0,
+        0,
+        0
+      ],
+      "energySupplied": [
+        3.59278,
+        3.61,
+        3.59611
+      ],
+      "energyNett": [
+        3.59278,
+        3.61,
+        3.59611
+      ],
+      "voltageA": [
+        238.33,
+        238.88,
+        238.56
+      ],
+      "voltageB": [
+        null,
+        null,
+        null
+      ],
+      "voltageC": [
+        null,
+        null,
+        null
+      ],
+      "powerFactorA": [
+        0.974,
+        0.974,
+        0.972
+      ],
+      "powerFactorB": [
+        null,
+        null,
+        null
+      ],
+      "powerFactorC": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "deviceId": 2,
+      "deviceType": "WATER_HEATER",
+      "rangeStart": 1666583415,
+      "rangeEnd": 1666583425,
+      "timestamp": [
+        1666583415,
+        1666583420,
+        1666583425
+      ],
+      "sampleSecs": [
+        5,
+        5,
+        5
+      ],
+      "operationStatus": [
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE"
+      ],
+      "operationMessage": [
+        null,
+        null,
+        null
+      ],
+      "energyConsumed": [
+        0,
+        0,
+        0
+      ],
+      "energyConsumedSolar": [
+        0,
+        0,
+        0
+      ],
+      "energyConsumedBattery": [
+        0,
+        0,
+        0
+      ],
+      "energyConsumedGrid": [
+        0,
+        0,
+        0
+      ],
+      "availableEnergy": [
+        450,
+        450,
+        450
+      ],
+      "maxEnergy": [
+        544,
+        544,
+        544
+      ],
+      "s1": [
+        44.38,
+        43.82,
+        43.3
+      ],
+      "s2": [
+        75.36,
+        75.3,
+        75.3
+      ],
+      "s3": [
+        75.38,
+        75.56,
+        75.42
+      ],
+      "s4": [
+        75.4,
+        75.38,
+        75.38
+      ],
+      "s5": [
+        75.3,
+        75.2,
+        75.2
+      ],
+      "s6": [
+        75.3,
+        75.3,
+        75.3
+      ],
+      "whStatus": [
+        "{\"appmode\":8,\"up\":101366,\"relay\":{\"A\":1704,\"B\":140,\"C\":114,\"D\":68,\"T\":0},\"fault\":{\"f0\":0,\"f1\":0,\"f2\":0,\"f3\":0,\"act\":[]},\"ec_res\":{\"active\":-1,\"id\":0,\"relay\":0,\"trip\":256,\"fault\":0},\"power\":{\"v\":234.1,\"a\":0.01,\"w\":-1,\"hz\":49.98},\"temp\":{\"ts1\":75.3,\"ts2\":75.3,\"ts3\":75.4,\"ts4\":75.4,\"ts5\":75.4,\"pcb1\":34,\"tbe\":44.2,\"els\":43.7}}",
+        "{\"appmode\":8,\"up\":101372,\"relay\":{\"A\":1704,\"B\":140,\"C\":114,\"D\":68,\"T\":0},\"fault\":{\"f0\":0,\"f1\":0,\"f2\":0,\"f3\":0,\"act\":[]},\"ec_res\":{\"active\":-1,\"id\":0,\"relay\":0,\"trip\":256,\"fault\":0},\"power\":{\"v\":233.82,\"a\":0.01,\"w\":-1,\"hz\":50},\"temp\":{\"ts1\":75.3,\"ts2\":75.2,\"ts3\":75.3,\"ts4\":75.4,\"ts5\":75.3,\"pcb1\":34,\"tbe\":43.5,\"els\":42.8}}",
+        "{\"appmode\":8,\"up\":101376,\"relay\":{\"A\":1704,\"B\":140,\"C\":114,\"D\":68,\"T\":0},\"fault\":{\"f0\":0,\"f1\":0,\"f2\":0,\"f3\":0,\"act\":[]},\"ec_res\":{\"active\":-1,\"id\":0,\"relay\":0,\"trip\":256,\"fault\":0},\"power\":{\"v\":233.49,\"a\":0.01,\"w\":-1,\"hz\":49.99},\"temp\":{\"ts1\":75.3,\"ts2\":75.2,\"ts3\":75.4,\"ts4\":75.4,\"ts5\":75.3,\"pcb1\":34.1,\"tbe\":43.1,\"els\":42.4}}"
+      ]
+    },
+    {
+      "deviceId": 5,
+      "deviceType": "ENERGY_BALANCE",
+      "rangeStart": 1666583415,
+      "rangeEnd": 1666583425,
+      "timestamp": [
+        1666583415,
+        1666583420,
+        1666583425
+      ],
+      "sampleSecs": [
+        5,
+        5,
+        5
+      ],
+      "operationStatus": [
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE"
+      ],
+      "operationMessage": [
+        null,
+        null,
+        null
+      ],
+      "energyConsumed": [
+        4.24833,
+        4.26444,
+        4.25111
+      ],
+      "energyConsumedSolar": [
+        0.66376,
+        0.66266,
+        0.66274
+      ],
+      "energyConsumedBattery": [
+        0,
+        0,
+        0
+      ],
+      "energyConsumedGrid": [
+        3.58457,
+        3.60179,
+        3.58837
+      ]
+    },
+    {
+      "deviceId": 8,
+      "deviceType": "GENERIC_CONSUMER",
+      "rangeStart": 1666583415,
+      "rangeEnd": 1666583425,
+      "timestamp": [
+        1666583415,
+        1666583420,
+        1666583425
+      ],
+      "sampleSecs": [
+        5,
+        5,
+        5
+      ],
+      "operationStatus": [
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE"
+      ],
+      "operationMessage": [
+        null,
+        null,
+        null
+      ],
+      "energyConsumed": [
+        0.00972,
+        0.00972,
+        0.00917
+      ],
+      "energyConsumedSolar": [
+        0.00152,
+        0.00151,
+        0.00143
+      ],
+      "energyConsumedBattery": [
+        0,
+        0,
+        0
+      ],
+      "energyConsumedGrid": [
+        0.0082,
+        0.00821,
+        0.00774
+      ]
+    }
+  ]
+}

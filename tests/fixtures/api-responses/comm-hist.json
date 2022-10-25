@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "installationId": 999998,
+  "history": [
+    {
+      "connected": true,
+      "t": 1666583413254,
+      "d": "Eth",
+      "s": 99415.872286
+    }
+  ],
+  "route": {
+    "t": 1666583413254,
+    "d": "Eth"
+  }
+}

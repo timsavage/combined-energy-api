@@ -1,6 +1,7 @@
 [dev-packages]
 pytest = "*"
 pytest-cov = "*"
+pytest-asyncio = "*"
 
 [packages]
 combined-energy-api = {path = "."}

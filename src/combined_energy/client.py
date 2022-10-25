@@ -11,12 +11,12 @@ import async_timeout
 from aiohttp import ClientSession, ClientResponseError, ClientError
 from aiohttp.hdrs import METH_GET
 
+from . import exceptions
 from .models import (
     ConnectionStatus,
     ConnectionHistory,
     InstallationCustomers,
     Installation,
-    Customer,
     CurrentUser,
     Readings,
 )
@@ -27,6 +27,10 @@ DATA_ACCESS_HOST = "https://ds20.combined.energy/data-service"
 
 @dataclass
 class CombinedEnergy:
+    """
+    Client library for Combined Energy API
+    """
+
     jwt: str
     installation_id: int
 
@@ -70,18 +74,19 @@ class CombinedEnergy:
                 response.raise_for_status()
 
         except asyncio.TimeoutError as ex:
-            raise Exception(
+            raise exceptions.CombinedEnergyTimeoutError(
                 "Timeout occurred while connecting to the Combined Energy API"
             ) from ex
 
         except ClientResponseError as ex:
+            # TODO: Process these errors (are often text...)
             raise
 
         except (
             ClientError,
             socket.gaierror,
         ) as ex:
-            raise Exception(
+            raise exceptions.CombinedEnergyError(
                 "Error occurred while communicating with the Combined Energy API"
             ) from ex
 
@@ -161,7 +166,6 @@ class CombinedEnergy:
         return await self.readings(now - delta, None, seconds)
 
     # getPerformanceSummary: dataHost + "/dataAccess/performance-summary",
-    # getTariffOptions: dataHost + "/dataAccess/tariff-options",
     # getTariffDetails: dataHost + "/dataAccess/tariff-details",
 
     async def communication_status(self) -> ConnectionStatus:

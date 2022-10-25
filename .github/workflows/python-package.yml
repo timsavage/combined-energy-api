@@ -2,7 +2,7 @@ name: Python package
 
 on:
   push:
-    branches: [ development, feature/*, bugfix/*, release/* ]
+    branches: [ develop, feature/*, bugfix/*, release/* ]
 
 jobs:
   tests:

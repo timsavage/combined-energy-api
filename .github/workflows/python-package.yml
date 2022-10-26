@@ -34,7 +34,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest \
+        poetry run pytest \
           --cov=combined_energy \
           --cov-branch \
           --junit-xml=reports/xunit-result-${{ matrix.python-version }}.xml \

@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  tests:
+  Testing:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -42,7 +42,7 @@ jobs:
           tests
 
     - name: 🔎 Analyze with SonarCloud
-      uses: sonarsource/sonarcloud-github-action@master
+      uses: SonarSource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

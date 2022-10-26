@@ -179,6 +179,10 @@ class DeviceReadings(BaseModel):
     sample_seconds: List[int] = Field(alias="sampleSecs")
 
 
+class DeviceReadingsBattery(DeviceReadings):
+    device_type: Literal["BATTERY"] = Field(alias="deviceType")
+
+
 class DeviceReadingsCombiner(DeviceReadings):
     device_type: Literal["COMBINER"] = Field(alias="deviceType")
 
@@ -198,6 +202,10 @@ class DeviceReadingsCombiner(DeviceReadings):
     energy_consumed_grid: List[float] = Field(alias="energyConsumedGrid")
     energy_correction: List[int] = Field(alias="energyCorrection")
     temperature: List[Optional[float]]
+
+
+class DeviceReadingsSolarPredicted(DeviceReadings):
+    device_type: Literal["SOLAR_PRED"] = Field(alias="deviceType")
 
 
 class DeviceReadingsSolarPV(DeviceReadings):
@@ -221,6 +229,10 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
     energy_consumed_solar: List[float] = Field(alias="energyConsumedSolar")
     energy_consumed_battery: List[float] = Field(alias="energyConsumedBattery")
     energy_consumed_grid: List[float] = Field(alias="energyConsumedGrid")
+
+
+class DeviceReadingsPoolHeater(DeviceReadings):
+    device_type: Literal["POOL_HEATER"] = Field(alias="deviceType")
 
 
 class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):

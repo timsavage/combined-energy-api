@@ -86,6 +86,11 @@ class CombinedEnergy:
             ) from ex
 
         except ClientResponseError as ex:
+            if ex.status == 401:
+                raise exceptions.CombinedEnergyPermissionError(
+                    "Current user does not have access to the specified resource"
+                ) from ex
+
             raise exceptions.CombinedEnergyError(
                 f"Unexpected error: {ex.status}"
             ) from ex

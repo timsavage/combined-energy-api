@@ -2,6 +2,11 @@
 
 Provides an async Python 3.8+ interface for the http://combined.energy/ monitoring platform API.
 
+> Note this API client is reverse engineered from observing requests being made  
+> in the web-application. Please report any failures to read data, this is likely
+> to occur for readings as I am only able to create entries for devices that I 
+> have.
+
 ## Installation
 
 This package is currently only available from source

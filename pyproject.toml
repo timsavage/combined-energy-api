@@ -7,11 +7,13 @@ name = "combined-energy-api"
 version = "0.1"
 description = "Python interface to the Combined Energy API"
 authors = ["Tim Savage <tim@savage.company>"]
+maintainers = ["Tim Savage <tim@savage.company>"]
 license = "BSD-3-Clause"
 readme = "README.md"
+homepage = "https://github.com/timsavage/combined-energy-api"
 repository = "https://github.com/timsavage/combined-energy-api"
 documentation = "https://github.com/timsavage/combined-energy-api"
-keywords = ["energy", "monitoring", "combined.energy"]
+keywords = ["energy", "monitoring", "combined.energy", "api", "client", "async"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -39,3 +41,5 @@ aresponses = "*"
 pytest = "^7.0"
 pytest-cov = "*"
 pytest-asyncio = "*"
+bandit = "^1.7.4"
+vulture = "^2.6"

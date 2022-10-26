@@ -41,5 +41,4 @@ asyncio.run(main())
 You will need:
 
 - Python 3.8+
-- pipenv
-- 
+- poetry

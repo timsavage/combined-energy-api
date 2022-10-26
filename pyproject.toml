@@ -1,16 +1,41 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "combined-energy-api"
-description = "Python interface to the Combined.Energy API"
-version = "0.1.0b1"
-requires-python = "~=3.8"
-dependencies= [
-  "aiohttp",
-  "pydantic"
+version = "0.1"
+description = "Python interface to the Combined Energy API"
+authors = ["Tim Savage <tim@savage.company>"]
+license = "BSD-3-Clause"
+readme = "README.md"
+repository = "https://github.com/timsavage/combined-energy-api"
+documentation = "https://github.com/timsavage/combined-energy-api"
+keywords = ["energy", "monitoring", "combined.energy"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+packages = [
+    { include = "combined_energy", from = "src" },
+    { include = "tests", format = "sdist" },
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.poetry.dependencies]
+python = "^3.8"
+aiohttp = "*"
+pydantic = "*"
+
+[tool.poetry.dev-dependencies]
+aresponses = "*"
+pytest = "^7.0"
+pytest-cov = "*"
+pytest-asyncio = "*"

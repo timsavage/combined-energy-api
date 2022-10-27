@@ -175,7 +175,7 @@ class DeviceReadings(BaseModel):
     device_id: Optional[int] = Field(alias="deviceId")
     range_start: datetime = Field(alias="rangeStart")
     range_end: datetime = Field(alias="rangeEnd")
-    timestamp: List[int]
+    timestamp: List[datetime]
     sample_seconds: List[int] = Field(alias="sampleSecs")
 
 
@@ -266,11 +266,14 @@ class Readings(BaseModel):
     server_time: datetime = Field(alias="serverTime")
     devices: List[
         Union[
+            DeviceReadingsBattery,
             DeviceReadingsCombiner,
+            DeviceReadingsSolarPredicted,
             DeviceReadingsSolarPV,
             DeviceReadingsGridMeter,
+            DeviceReadingsGenericConsumer,
+            DeviceReadingsPoolHeater,
             DeviceReadingsWaterHeater,
             DeviceReadingsEnergyBalance,
-            DeviceReadingsGenericConsumer,
         ]
     ] = Field(descriminator="device_type")

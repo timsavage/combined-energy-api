@@ -175,8 +175,12 @@ class DeviceReadings(BaseModel):
     device_id: Optional[int] = Field(alias="deviceId")
     range_start: datetime = Field(alias="rangeStart")
     range_end: datetime = Field(alias="rangeEnd")
-    timestamp: List[int]
+    timestamp: List[datetime]
     sample_seconds: List[int] = Field(alias="sampleSecs")
+
+
+class DeviceReadingsBattery(DeviceReadings):
+    device_type: Literal["BATTERY"] = Field(alias="deviceType")
 
 
 class DeviceReadingsCombiner(DeviceReadings):
@@ -200,6 +204,10 @@ class DeviceReadingsCombiner(DeviceReadings):
     temperature: List[Optional[float]]
 
 
+class DeviceReadingsSolarPredicted(DeviceReadings):
+    device_type: Literal["SOLAR_PRED"] = Field(alias="deviceType")
+
+
 class DeviceReadingsSolarPV(DeviceReadings):
     device_type: Literal["SOLAR_PV"] = Field(alias="deviceType")
     operation_status: List[str] = Field(alias="operationStatus")
@@ -221,6 +229,10 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
     energy_consumed_solar: List[float] = Field(alias="energyConsumedSolar")
     energy_consumed_battery: List[float] = Field(alias="energyConsumedBattery")
     energy_consumed_grid: List[float] = Field(alias="energyConsumedGrid")
+
+
+class DeviceReadingsPoolHeater(DeviceReadings):
+    device_type: Literal["POOL_HEATER"] = Field(alias="deviceType")
 
 
 class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
@@ -254,11 +266,14 @@ class Readings(BaseModel):
     server_time: datetime = Field(alias="serverTime")
     devices: List[
         Union[
+            DeviceReadingsBattery,
             DeviceReadingsCombiner,
+            DeviceReadingsSolarPredicted,
             DeviceReadingsSolarPV,
             DeviceReadingsGridMeter,
+            DeviceReadingsGenericConsumer,
+            DeviceReadingsPoolHeater,
             DeviceReadingsWaterHeater,
             DeviceReadingsEnergyBalance,
-            DeviceReadingsGenericConsumer,
         ]
     ] = Field(descriminator="device_type")

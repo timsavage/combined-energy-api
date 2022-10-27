@@ -27,7 +27,7 @@ USER_ACCESS_HOST = "https://onwatch.combined.energy"
 DATA_ACCESS_HOST = "https://ds20.combined.energy/data-service"
 now = datetime.datetime.now
 
-LOGGING = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -77,7 +77,8 @@ class CombinedEnergy:
                     method, url, params=params, headers=headers, data=data
                 )
                 if response.status == 500:
-                    LOGGING.error("Server error: %s", await response.text())
+                    # Trigger response.text to ensure error is captured
+                    LOGGER.error("Server error: %s", await response.text())
                 response.raise_for_status()
 
         except asyncio.TimeoutError as ex:
@@ -86,14 +87,20 @@ class CombinedEnergy:
             ) from ex
 
         except ClientResponseError as ex:
+            if ex.status == 401:
+                raise exceptions.CombinedEnergyPermissionError(
+                    "Current user does not have access to the specified resource"
+                ) from ex
+
             raise exceptions.CombinedEnergyError(
-                f"Unexpected error: {ex.status}"
+                f"Unexpected error: {ex.status}", ex.status
             ) from ex
 
         except (
             ClientError,
             socket.gaierror,
         ) as ex:
+            LOGGER.error("Socket error: %s", ex)
             raise exceptions.CombinedEnergyError(
                 "Error occurred while communicating with the Combined Energy API"
             ) from ex
@@ -111,7 +118,7 @@ class CombinedEnergy:
     async def _request(self, url: str, **params):
         # Check if a login is required
         if not self._jwt or now() > self._expires:
-            LOGGING.info("Login expired; re-login" if self._jwt else "Login required")
+            LOGGER.info("Login expired; re-login" if self._jwt else "Login required")
             await self._get_token()
 
         # Apply token

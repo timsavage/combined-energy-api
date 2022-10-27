@@ -1,10 +1,11 @@
-import json
 from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import AsyncMock
 
-import aiohttp.client
+import aresponses
 import pytest
+from aresponses import ResponsesMockServer
+from yarl import URL
 
 from combined_energy import client
 from combined_energy.models import (
@@ -17,32 +18,54 @@ from combined_energy.models import (
 )
 
 
-def create_mock_session(response: Path, *, status: int = 200):
-    content = response.read_text(encoding="UTF-8")
-    return AsyncMock(
-        aiohttp.client.ClientSession,
-        request=AsyncMock(
-            return_value=AsyncMock(
-                status=status,
-                text=AsyncMock(return_value=content),
-                json=AsyncMock(return_value=json.loads(content)),
-            ),
-        ),
-    )
-
-
-def create_mocked_client(response: Path):
-    content = response.read_text(encoding="UTF-8")
-    target = client.CombinedEnergy("user@example.com", "password", installation_id=123)
-    target._request = AsyncMock(return_value=json.loads(content))
-
-    return target
-
-
 @pytest.fixture
 def fixed_time(monkeypatch):
     monkeypatch.setattr(
         client, "now", lambda: datetime(2022, 10, 24, 3, 50, 23, tzinfo=timezone.utc)
+    )
+
+
+def mock_route(
+    mock_server: ResponsesMockServer,
+    url: URL,
+    response: Path = None,
+    *,
+    method: str = "GET",
+    status: int = 200,
+    mock_login: bool = True,
+    **params: str,
+):
+    """
+    Generate a mock route from a fixture file
+    """
+    url = URL(url)
+
+    if mock_login:
+        mock_server.add(
+            "onwatch.combined.energy",
+            "/user/Login",
+            "POST",
+            aresponses.Response(
+                text="""{"status": "ok", "jwt": "foo", "expireMins": 30}""",
+                status=200,
+                content_type="application/json",
+            ),
+        )
+        params["jwt"] = "foo"
+
+    if params:
+        url = url.with_query(params)
+
+    mock_server.add(
+        url.host,
+        url.path_qs,
+        method,
+        aresponses.Response(
+            text=response.read_text(),
+            status=status,
+            content_type="application/json",
+        ),
+        match_querystring=True,
     )
 
 
@@ -52,41 +75,61 @@ class TestCombinedEnergy:
         return client.CombinedEnergy("user@example", "pass", installation_id=123)
 
     @pytest.mark.asyncio
-    async def test_user(self, api_responses: Path):
-        target = create_mocked_client(api_responses / "user.json")
+    async def test_user(self, api_responses: Path, aresponses, target):
+        mock_route(
+            aresponses,
+            client.DATA_ACCESS_HOST + "/dataAccess/user",
+            api_responses / "user.json",
+        )
 
         actual = await target.user()
 
+        aresponses.assert_plan_strictly_followed()
         assert actual.status == "ok"
         assert actual.user.fullname == "Dave Dobbs"
-        target._request.assert_called_with(client.DATA_ACCESS_HOST + "/dataAccess/user")
 
     @pytest.mark.asyncio
-    async def test_installation(self, api_responses: Path):
-        target = create_mocked_client(api_responses / "installation.json")
+    async def test_installation(self, api_responses: Path, aresponses, target):
+        mock_route(
+            aresponses,
+            client.DATA_ACCESS_HOST + "/dataAccess/installation",
+            api_responses / "installation.json",
+            i="123",
+        )
 
         actual = await target.installation()
 
+        aresponses.assert_plan_strictly_followed()
         assert actual.status == "ACTIVE"
-        target._request.assert_called_with(
-            client.DATA_ACCESS_HOST + "/dataAccess/installation", i=123
-        )
 
     @pytest.mark.asyncio
-    async def test_installation_customers(self, api_responses: Path):
-        target = create_mocked_client(api_responses / "inst-customers.json")
+    async def test_installation_customers(
+        self, api_responses: Path, aresponses, target
+    ):
+        mock_route(
+            aresponses,
+            client.DATA_ACCESS_HOST + "/dataAccess/inst-customers",
+            api_responses / "inst-customers.json",
+            i="123",
+        )
 
         actual = await target.installation_customers()
 
+        aresponses.assert_plan_strictly_followed()
         assert actual.status == "ok"
         assert actual.customers[0].primary is True
-        target._request.assert_called_with(
-            client.DATA_ACCESS_HOST + "/dataAccess/inst-customers", i=123
-        )
 
     @pytest.mark.asyncio
-    async def test_readings(self, api_responses: Path):
-        target = create_mocked_client(api_responses / "readings.json")
+    async def test_readings(self, api_responses: Path, aresponses, target):
+        mock_route(
+            aresponses,
+            client.DATA_ACCESS_HOST + "/dataAccess/readings",
+            api_responses / "readings.json",
+            i="123",
+            rangeStart="1666583413",
+            rangeEnd="1666583423",
+            seconds="5",
+        )
 
         actual = await target.readings(
             datetime(2022, 10, 24, 3, 50, 13, tzinfo=timezone.utc),
@@ -94,6 +137,7 @@ class TestCombinedEnergy:
             increment=5,
         )
 
+        aresponses.assert_plan_strictly_followed()
         assert actual.devices[0].device_type == "COMBINER"
         isinstance(actual.devices[0], DeviceReadingsCombiner)
         assert actual.devices[1].device_type == "SOLAR_PV"
@@ -107,23 +151,26 @@ class TestCombinedEnergy:
         assert actual.devices[6].device_type == "GENERIC_CONSUMER"
         isinstance(actual.devices[6], DeviceReadingsGenericConsumer)
 
-        target._request.assert_called_with(
-            client.DATA_ACCESS_HOST + "/dataAccess/readings",
-            i=123,
-            rangeStart=1666583413,
-            rangeEnd=1666583423,
-            seconds=5,
-        )
-
     @pytest.mark.asyncio
-    async def test_last_readings(self, api_responses: Path, fixed_time):
-        target = create_mocked_client(api_responses / "readings.json")
+    async def test_last_readings(
+        self, api_responses: Path, aresponses, target, fixed_time
+    ):
+        mock_route(
+            aresponses,
+            client.DATA_ACCESS_HOST + "/dataAccess/readings",
+            api_responses / "readings.json",
+            i="123",
+            rangeStart="1666583123",
+            rangeEnd="",
+            seconds="5",
+        )
 
         actual = await target.last_readings(
             minutes=5,
             increment=5,
         )
 
+        aresponses.assert_plan_strictly_followed()
         assert actual.range_start == datetime(
             2022, 10, 24, 3, 50, 15, tzinfo=timezone.utc
         )
@@ -131,37 +178,31 @@ class TestCombinedEnergy:
             2022, 10, 24, 3, 50, 25, tzinfo=timezone.utc
         )
 
-        target._request.assert_called_with(
-            client.DATA_ACCESS_HOST + "/dataAccess/readings",
-            i=123,
-            rangeStart=1666583123,
-            rangeEnd="",
-            seconds=5,
-        )
-
     @pytest.mark.asyncio
     async def test_last_reading__where_no_range_specified(
-        self,
-        target,
+        self, api_responses: Path, target
     ):
         with pytest.raises(ValueError):
             await target.last_readings(increment=5)
 
     @pytest.mark.asyncio
-    async def test_communication_status(self, api_responses: Path):
-        target = create_mocked_client(api_responses / "comm-stat.json")
+    async def test_communication_status(self, api_responses: Path, aresponses, target):
+        mock_route(
+            aresponses,
+            client.DATA_ACCESS_HOST + "/dataAccess/comm-stat",
+            api_responses / "comm-stat.json",
+            i="123",
+        )
 
         actual = await target.communication_status()
 
+        aresponses.assert_plan_strictly_followed()
         assert actual.status == "ok"
         assert actual.connected is True
         assert actual.since == datetime(2022, 10, 24, 3, 50, 13, tzinfo=timezone.utc)
-        target._request.assert_called_with(
-            client.DATA_ACCESS_HOST + "/dataAccess/comm-stat", i=123
-        )
 
     @pytest.mark.asyncio
-    async def test_communication_history(self, target, aresponses, api_responses: Path):
+    async def test_communication_history(self, api_responses: Path, aresponses, target):
         aresponses.add(
             "onwatch.combined.energy",
             "/user/Login",
@@ -185,13 +226,16 @@ class TestCombinedEnergy:
 
         actual = await target.communication_history()
 
+        aresponses.assert_plan_strictly_followed()
         assert actual.status == "ok"
         assert actual.history[0].timestamp == datetime(
             2022, 10, 24, 3, 50, 13, 254000, tzinfo=timezone.utc
         )
 
     @pytest.mark.asyncio
-    async def test_login__where_login_is_successful(self, target, aresponses):
+    async def test_login__where_login_is_successful(
+        self, api_responses: Path, aresponses, target
+    ):
         aresponses.add(
             "onwatch.combined.energy",
             "/user/Login",
@@ -225,6 +269,62 @@ class TestCombinedEnergy:
             await target.login()
 
         aresponses.assert_plan_strictly_followed()
+
+    @pytest.mark.asyncio
+    async def test_request__with_permission_denied(
+        self, target, aresponses, api_responses
+    ):
+        mock_route(
+            aresponses,
+            client.DATA_ACCESS_HOST + "/dataAccess/comm-stat",
+            api_responses / "comm-stat.json",
+            status=401,
+            i="123",
+        )
+
+        with pytest.raises(client.exceptions.CombinedEnergyPermissionError):
+            await target.communication_status()
+
+        aresponses.assert_plan_strictly_followed()
+
+    @pytest.mark.asyncio
+    async def test_request__with_server_error(
+        self, target, aresponses, api_responses, caplog
+    ):
+        caplog.at_level("ERROR", client.LOGGER)
+        mock_route(
+            aresponses,
+            client.DATA_ACCESS_HOST + "/dataAccess/comm-stat",
+            api_responses / "comm-stat.json",
+            status=500,
+            i="123",
+        )
+
+        with pytest.raises(client.exceptions.CombinedEnergyError):
+            await target.communication_status()
+
+        aresponses.assert_plan_strictly_followed()
+        assert len(caplog.messages) == 1
+        assert caplog.messages[0].startswith("Server error")
+
+    @pytest.mark.asyncio
+    async def test_request__with_client_error(
+        self, target, aresponses, api_responses, caplog
+    ):
+        caplog.at_level("ERROR", client.LOGGER)
+        mock_route(
+            aresponses,
+            client.DATA_ACCESS_HOST + "/dataAccess/comm-stat",
+            api_responses / "comm-stat.json",
+            i="123",
+            eek="!",
+        )
+
+        with pytest.raises(client.exceptions.CombinedEnergyError):
+            await target.communication_status()
+
+        assert len(caplog.messages) == 2
+        assert caplog.messages[1].startswith("Socket error")
 
     @pytest.mark.asyncio
     async def test_async_context_manager__external_session(self):

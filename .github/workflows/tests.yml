@@ -1,48 +1,48 @@
-name: Python package
+name: Testing
 
 on:
   push:
-    branches: [ develop, feature/*, bugfix/*, release/* ]
+  workflow_dispatch:
 
 jobs:
-  tests:
+  Testing:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: true
       matrix:
-        python-version: [3.8, 3.9, "3.10", "3.11-dev"]
+        python-version: [3.8, 3.9, "3.10", "3.11"]
         experimental: [false]
         include:
-          - python-version: "3.11"
+          - python-version: "3.11-dev"
             experimental: true
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: 🐍 Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@master
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
+    - name: 🌐 Install dependencies
       run: |
-        python -m pip install --upgrade pip pipenv build
-        pipenv install --deploy --system --dev
+        python -m pip install --upgrade pip poetry
+        poetry install --no-interaction
 
-    - name: Test with pytest
+    - name: 🧪 Test with pytest
       run: |
-        pytest \
+        poetry run pytest \
           --cov=combined_energy \
           --cov-branch \
           --junit-xml=reports/xunit-result-${{ matrix.python-version }}.xml \
           --cov-report=xml:reports/coverage-${{ matrix.python-version }}.xml \
           tests
 
-#    - name: Analyze with SonarCloud
-#      uses: sonarsource/sonarcloud-github-action@master
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: 🔎 Analyze with SonarCloud
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

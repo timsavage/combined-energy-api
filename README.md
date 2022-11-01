@@ -9,7 +9,11 @@ Provides an async Python 3.8+ interface for the http://combined.energy/ monitori
 
 ## Installation
 
-This package is currently only available from source
+Install from PyPI
+
+```shell
+python3 -m pip install combined-energy-api
+```
 
 ## Usage
 

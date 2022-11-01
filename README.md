@@ -1,6 +1,6 @@
 # Python: Asynchronous client for Combined Energy API
 
-Provides an async Python 3.10+ interface for the http://combined.energy/ monitoring platform API.
+Provides an async Python 3.8+ interface for the http://combined.energy/ monitoring platform API.
 
 > Note this API client is reverse engineered from observing requests being made  
 > in the web-application. Please report any failures to read data, this is likely
@@ -49,5 +49,5 @@ asyncio.run(main())
 
 You will need:
 
-- Python 3.10+
+- Python 3.8+
 - poetry

@@ -6,6 +6,15 @@ import pytest
 from combined_energy import helpers
 
 
+async def async_iter(iterable):
+    async for item in iterable:
+        yield item
+
+
+async def async_next(iterator):
+    return await iterator.__anext__()
+
+
 class TestReadingsIterator:
     def test_next_range_start__where_no_request_made(self):
         target = helpers.ReadingsIterator(
@@ -77,29 +86,29 @@ class TestReadingsIterator:
         target = helpers.ReadingsIterator(
             mock_client, increment=10, log_session_reset_count=2
         )
-        iterator = aiter(target)
+        iterator = async_iter(target)
 
         # Check first request
-        await anext(iterator)
+        await async_next(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 21)
         mock_client.start_log_session.assert_not_called()
 
         # Check second request
-        await anext(iterator)
+        await async_next(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 22)
         mock_client.start_log_session.assert_not_called()
 
         # Check third request
-        await anext(iterator)
+        await async_next(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 22)
         mock_client.start_log_session.assert_not_called()
 
         # Check forth request
-        await anext(iterator)
+        await async_next(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 22)
         mock_client.start_log_session.assert_not_called()
 
         # Check fifth request
-        await anext(iterator)
+        await async_next(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 25)
         mock_client.start_log_session.assert_called()

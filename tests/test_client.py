@@ -271,6 +271,35 @@ class TestCombinedEnergy:
         aresponses.assert_plan_strictly_followed()
 
     @pytest.mark.asyncio
+    async def test_start_log_session__where_refresh_is_successful(
+        self, api_responses, target, aresponses
+    ):
+        aresponses.add(
+            "onwatch.combined.energy",
+            "/user/Login",
+            "POST",
+            aresponses.Response(
+                text="""{"status": "ok", "jwt": "foo", "expireMins": 30}""",
+                status=200,
+                content_type="application/json",
+            ),
+        )
+        aresponses.add(
+            "dp20.combined.energy",
+            "/mqtt2/user/LogSessionStart",
+            "POST",
+            aresponses.Response(
+                text=(api_responses / "LogSessionStart.json").read_text(),
+                status=200,
+                content_type="application/json",
+            ),
+        )
+
+        await target.start_log_session()
+
+        aresponses.assert_plan_strictly_followed()
+
+    @pytest.mark.asyncio
     async def test_request__with_permission_denied(
         self, target, aresponses, api_responses
     ):

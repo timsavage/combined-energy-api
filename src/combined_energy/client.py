@@ -25,9 +25,10 @@ from .models import (
 
 USER_ACCESS_HOST = "https://onwatch.combined.energy"
 DATA_ACCESS_HOST = "https://ds20.combined.energy/data-service"
+MQTT_ACCESS_HOST = "https://dp20.combined.energy"
 now = datetime.datetime.now
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__package__)
 
 
 @dataclass
@@ -57,13 +58,15 @@ class CombinedEnergy:
         data: Dict[str, str] = None,
         *,
         method: str = METH_GET,
+        accept: str = "application/json",
+        request_timeout: float = None,
     ):
         """
         Handle a request to the Combined Energy API
         """
         version = metadata.version("combined-energy-api")
         headers = {
-            "Accept": "application/json",
+            "Accept": accept,
             "User-Agent": f"PythonCombinedEnergy/{version}",
         }
 
@@ -71,8 +74,15 @@ class CombinedEnergy:
             self.session = ClientSession()
             self._close_session = True
 
+        if LOGGER.isEnabledFor(logging.DEBUG):
+            LOGGER.debug(
+                "Request to %s?%s",
+                url,
+                "&".join(f"{k}={v}" for k, v in (params or {}).items()),
+            )
+
         try:
-            async with async_timeout.timeout(self.request_timeout):
+            async with async_timeout.timeout(request_timeout or self.request_timeout):
                 response = await self.session.request(
                     method, url, params=params, headers=headers, data=data
                 )
@@ -115,13 +125,17 @@ class CombinedEnergy:
         self._jwt = login.jwt
         self._expires = login.expires(self.expiry_window)
 
-    async def _request(self, url: str, **params):
-        # Check if a login is required
+    async def _ensure_token(self):
+        """
+        Check if token is required
+        """
         if not self._jwt or now() > self._expires:
             LOGGER.info("Login expired; re-login" if self._jwt else "Login required")
             await self._get_token()
 
+    async def _request(self, url: str, **params):
         # Apply token
+        await self._ensure_token()
         params.setdefault("jwt", self._jwt)
 
         return await self._make_request(url, params)
@@ -165,7 +179,7 @@ class CombinedEnergy:
 
     async def readings(
         self,
-        range_start: datetime.datetime,
+        range_start: Optional[datetime.datetime],
         range_end: Optional[datetime.datetime],
         increment: int,
     ) -> Readings:
@@ -179,7 +193,7 @@ class CombinedEnergy:
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/readings",
             i=self.installation_id,
-            rangeStart=int(range_start.timestamp()),
+            rangeStart=int(range_start.timestamp()) if range_start else "",
             rangeEnd=int(range_end.timestamp()) if range_end else "",
             seconds=increment,
         )
@@ -189,6 +203,7 @@ class CombinedEnergy:
         self,
         hours: float = 0,
         minutes: float = 0,
+        seconds: float = 0,
         *,
         increment: int,
     ):
@@ -197,10 +212,11 @@ class CombinedEnergy:
 
         :param hours: Delta in hours
         :param minutes: Delta in minutes
+        :param seconds: Delta in seconds
         :param increment: Sample increment size in seconds
         """
 
-        delta = datetime.timedelta(hours=hours, minutes=minutes)
+        delta = datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
         if not delta.total_seconds():
             raise ValueError("Either a time range must be provided")
         return await self.readings(now() - delta, None, increment)
@@ -245,8 +261,32 @@ class CombinedEnergy:
             raise exceptions.CombinedEnergyAuthError(data.get("error", "Login failed"))
         return Login.parse_obj(data)
 
+    async def start_log_session(self) -> bool:
+        """
+        Trigger the start of a log session (required if readings stop being supplied)
+        """
+        await self._ensure_token()
+
+        try:
+            data = await self._make_request(
+                MQTT_ACCESS_HOST + "/mqtt2/user/LogSessionStart",
+                data={
+                    "i": self.installation_id,
+                    "jwt": self._jwt,
+                },
+                method=METH_POST,
+                request_timeout=30.0,
+            )
+            return data.get("status") == "ok"
+
+        except exceptions.CombinedEnergyTimeoutError:
+            print(self.session)
+            return True  # Assume ok
+
     async def close(self) -> None:
-        """Close open client session."""
+        """
+        Close open client session.
+        """
         if self.session and self._close_session:
             await self.session.close()
             self.session = None

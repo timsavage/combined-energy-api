@@ -43,7 +43,7 @@ class CombinedEnergy:
 
     # Configuration Options
     expiry_window: int = 300
-    request_timeout: float = 8.0
+    request_timeout: float = 10.0
 
     # State
     session: Optional[ClientSession] = None
@@ -275,12 +275,13 @@ class CombinedEnergy:
                     "jwt": self._jwt,
                 },
                 method=METH_POST,
-                request_timeout=30.0,
             )
             return data.get("status") == "ok"
 
-        except exceptions.CombinedEnergyTimeoutError:
-            print(self.session)
+        except exceptions.CombinedEnergyTimeoutError as ex:
+            # Not sure why this particular request consistently times out, ignoring
+            # the response brings it back to life
+            LOGGER.warning("LogSessionStart request timed out with: %s", ex)
             return True  # Assume ok
 
     async def close(self) -> None:

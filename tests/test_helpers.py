@@ -1,18 +1,26 @@
 from datetime import datetime, timedelta
 from unittest.mock import Mock, AsyncMock
 
+
+try:
+    from builtins import aiter, anext
+except ImportError:
+    from typing import AsyncIterable, AsyncIterator, TypeVar, Awaitable
+
+    _T = TypeVar("_T")
+
+    def aiter(iterable: AsyncIterable) -> AsyncIterator:
+        """Return an AsyncIterator for an AsyncIterable object."""
+        return iterable.__aiter__()
+
+    def anext(iterator: AsyncIterator[_T]) -> Awaitable[_T]:
+        """Return the next item from the async iterator."""
+        return iterator.__anext__()
+
+
 import pytest
 
 from combined_energy import helpers
-
-
-async def async_iter(iterable):
-    async for item in iterable:
-        yield item
-
-
-async def async_next(iterator):
-    return await iterator.__anext__()
 
 
 class TestReadingsIterator:
@@ -86,29 +94,29 @@ class TestReadingsIterator:
         target = helpers.ReadingsIterator(
             mock_client, increment=10, log_session_reset_count=2
         )
-        iterator = async_iter(target)
+        iterator = aiter(target)
 
         # Check first request
-        await async_next(iterator)
+        await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 21)
         mock_client.start_log_session.assert_not_called()
 
         # Check second request
-        await async_next(iterator)
+        await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 22)
         mock_client.start_log_session.assert_not_called()
 
         # Check third request
-        await async_next(iterator)
+        await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 22)
         mock_client.start_log_session.assert_not_called()
 
         # Check forth request
-        await async_next(iterator)
+        await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 22)
         mock_client.start_log_session.assert_not_called()
 
         # Check fifth request
-        await async_next(iterator)
+        await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 25)
         mock_client.start_log_session.assert_called()

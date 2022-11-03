@@ -21,6 +21,7 @@ python3 -m pip install combined-energy-api
 import asyncio
 
 from combined_energy import CombinedEnergy
+from combined_energy.helpers import ReadingsIterator
 
 async def main():
     """
@@ -36,9 +37,11 @@ async def main():
         status = await combined_energy.communication_status()
         print(status)
 
-        # Get the last 2 hours in 5 min increments
-        readings = await combined_energy.last_readings(hours=2, increment=300)
-        print(readings)
+        # To generate a stream of readings use the iterator, this example fetches
+        # data in 5 minute increments
+        async for readings in ReadingsIterator(combined_energy, increment=300):
+            print(readings)
+            await asyncio.sleep(300)
 
 asyncio.run(main())
 

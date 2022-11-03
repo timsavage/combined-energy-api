@@ -1,9 +1,16 @@
+"""Constants used by API."""
 from enum import Enum
+import logging
+
+LOGGER = logging.getLogger(__package__)
 
 
 class DeviceType(str, Enum):
+    """Type of device."""
+
     Battery = "BATTERY"
     Combiner = "COMBINER"
+    EnergyPredicted = "ENERGY_PRED"
     Receiver = "DRED_RECEIVER"  # Not sure what this is
     EnergyBalance = "ENERGY_BALANCE"
     GenericConsumer = "GENERIC_CONSUMER"
@@ -18,6 +25,8 @@ class DeviceType(str, Enum):
 
 
 class Category(str, Enum):
+    """Category of device."""
+
     Airconditioner = "AIRCON"
     Battery = "BATTERY"
     Building = "BUILDING"

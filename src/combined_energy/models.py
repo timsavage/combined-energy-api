@@ -1,16 +1,17 @@
+"""API Schema model."""
 from datetime import datetime, timedelta
-from typing import List, Optional, Dict, Literal, Union
+from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
+
+from .constants import LOGGER, DeviceType
 
 now = datetime.now
 OptionalFloatList = List[Optional[float]]
 
 
 class Login(BaseModel):
-    """
-    Response from Login
-    """
+    """Response from Login."""
 
     status: str
     expire_minutes: int = Field(alias="expireMins")
@@ -20,22 +21,18 @@ class Login(BaseModel):
     created: datetime = Field(default_factory=now)
 
     def expires(self, expiry_window: int) -> datetime:
-        """
-        Calculate when this login expires
-        """
+        """Calculate when this login expires."""
         offset = timedelta(minutes=self.expire_minutes, seconds=-expiry_window)
         return self.created + offset
 
 
-class CommonModel(BaseModel):
+class _CommonModel(BaseModel):
     status: str
     installation_id: int = Field(alias="installationId")
 
 
 class User(BaseModel):
-    """
-    Individual user
-    """
+    """Individual user."""
 
     type: str
     id: int
@@ -47,27 +44,21 @@ class User(BaseModel):
 
 
 class CurrentUser(BaseModel):
-    """
-    Current logged in user
-    """
+    """Current logged in user."""
 
     status: str
     user: User
 
 
-class ConnectionStatus(CommonModel):
-    """
-    Connection Status of the monitor
-    """
+class ConnectionStatus(_CommonModel):
+    """Connection Status of the monitor."""
 
     connected: bool
     since: datetime
 
 
 class ConnectionHistoryEntry(BaseModel):
-    """
-    Entry in connection history
-    """
+    """Entry in connection history."""
 
     connected: bool
     timestamp: datetime = Field(alias="t")
@@ -76,27 +67,21 @@ class ConnectionHistoryEntry(BaseModel):
 
 
 class ConnectionHistoryRoute(BaseModel):
-    """
-    Route in connection history
-    """
+    """Route in connection history."""
 
     timestamp: datetime = Field(alias="t")
     device: str = Field(alias="d")
 
 
-class ConnectionHistory(CommonModel):
-    """
-    Connection History of the monitor
-    """
+class ConnectionHistory(_CommonModel):
+    """Connection History of the monitor."""
 
     history: List[ConnectionHistoryEntry]
     route: ConnectionHistoryRoute
 
 
 class Device(BaseModel):
-    """
-    Details of a device
-    """
+    """Details of a device."""
 
     device_id: int = Field(alias="deviceId")
     ref_name: str = Field(alias="refName")
@@ -115,10 +100,8 @@ class Device(BaseModel):
     category: str
 
 
-class Installation(CommonModel):
-    """
-    Details of an installation
-    """
+class Installation(_CommonModel):
+    """Details of an installation."""
 
     source: str
     role: str
@@ -149,9 +132,7 @@ class Installation(CommonModel):
 
 
 class Customer(BaseModel):
-    """
-    Individual customer
-    """
+    """Individual customer."""
 
     customer_id: int = Field(alias="customerId")
     phone: Optional[str]
@@ -160,31 +141,25 @@ class Customer(BaseModel):
     primary: bool
 
 
-class InstallationCustomers(CommonModel):
-    """
-    Response from customers
-    """
+class InstallationCustomers(_CommonModel):
+    """Response from customers."""
 
     customers: List[Customer]
 
 
 class DeviceReadings(BaseModel):
-    """
-    Readings for a particular device
-    """
+    """Readings for a particular device."""
 
     device_id: Optional[int] = Field(alias="deviceId")
-    range_start: datetime = Field(alias="rangeStart")
-    range_end: datetime = Field(alias="rangeEnd")
+    range_start: Optional[datetime] = Field(alias="rangeStart")
+    range_end: Optional[datetime] = Field(alias="rangeEnd")
     timestamp: List[datetime]
     sample_seconds: Optional[List[int]] = Field(alias="sampleSecs")
 
 
-class DeviceReadingsBattery(DeviceReadings):
-    device_type: Literal["BATTERY"] = Field(alias="deviceType")
-
-
 class DeviceReadingsCombiner(DeviceReadings):
+    """Readings for the Combiner device."""
+
     device_type: Literal["COMBINER"] = Field(alias="deviceType")
 
     energy_supplied: Optional[OptionalFloatList] = Field(alias="energySupplied")
@@ -223,11 +198,9 @@ class DeviceReadingsCombiner(DeviceReadings):
     temperature: Optional[OptionalFloatList]
 
 
-class DeviceReadingsSolarPredicted(DeviceReadings):
-    device_type: Literal["SOLAR_PRED"] = Field(alias="deviceType")
-
-
 class DeviceReadingsSolarPV(DeviceReadings):
+    """Readings for the Solar PV device."""
+
     device_type: Literal["SOLAR_PV"] = Field(alias="deviceType")
     operation_status: Optional[List[Optional[str]]] = Field(alias="operationStatus")
     operation_message: Optional[List[Optional[str]]] = Field(alias="operationMessage")
@@ -236,10 +209,14 @@ class DeviceReadingsSolarPV(DeviceReadings):
 
 
 class DeviceReadingsGridMeter(DeviceReadings):
+    """Readings for the Grid Meter device."""
+
     device_type: Literal["GRID_METER"] = Field(alias="deviceType")
 
 
 class DeviceReadingsGenericConsumer(DeviceReadings):
+    """Readings for a Generic consumer device."""
+
     device_type: Literal["GENERIC_CONSUMER"] = Field(alias="deviceType")
     operation_status: Optional[List[Optional[str]]] = Field(alias="operationStatus")
     operation_message: Optional[List[Optional[str]]] = Field(alias="operationMessage")
@@ -252,11 +229,9 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
     energy_consumed_grid: Optional[List[float]] = Field(alias="energyConsumedGrid")
 
 
-class DeviceReadingsPoolHeater(DeviceReadings):
-    device_type: Literal["POOL_HEATER"] = Field(alias="deviceType")
-
-
 class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
+    """Readings for a Water heater device."""
+
     device_type: Literal["WATER_HEATER"] = Field(alias="deviceType")
 
     available_energy: Optional[OptionalFloatList] = Field(alias="availableEnergy")
@@ -271,13 +246,23 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
 
 
 class DeviceReadingsEnergyBalance(DeviceReadingsGenericConsumer):
+    """Readings for the Energy Balance device."""
+
     device_type: Literal["ENERGY_BALANCE"] = Field(alias="deviceType")
 
 
+DEVICE_TYPE_MAP = {
+    DeviceType.Combiner: DeviceReadingsCombiner,
+    DeviceType.SolarPV: DeviceReadingsSolarPV,
+    DeviceType.GridMeter: DeviceReadingsGridMeter,
+    DeviceType.GenericConsumer: DeviceReadingsGenericConsumer,
+    DeviceType.WaterHeater: DeviceReadingsWaterHeater,
+    DeviceType.EnergyBalance: DeviceReadingsEnergyBalance,
+}
+
+
 class Readings(BaseModel):
-    """
-    Reading history data
-    """
+    """Reading history data."""
 
     range_start: datetime = Field(alias="rangeStart")
     range_end: datetime = Field(alias="rangeEnd")
@@ -285,16 +270,39 @@ class Readings(BaseModel):
     seconds: int
     installation_id: int = Field(alias="installationId")
     server_time: datetime = Field(alias="serverTime")
-    devices: List[
-        Union[
-            DeviceReadingsBattery,
-            DeviceReadingsCombiner,
-            DeviceReadingsSolarPredicted,
-            DeviceReadingsSolarPV,
-            DeviceReadingsGridMeter,
-            DeviceReadingsGenericConsumer,
-            DeviceReadingsPoolHeater,
-            DeviceReadingsWaterHeater,
-            DeviceReadingsEnergyBalance,
-        ]
-    ] = Field(descriminator="device_type")
+
+    devices: List[DeviceReadings]
+    unknown_devices: List[Dict[str, Any]]
+
+    def __init__(self, **data):
+        """Initialise readings and pre-process devices."""
+        raw_devices = data.pop("devices", [])
+        data["devices"], data["unknown_devices"] = self._populate_devices(raw_devices)
+        super().__init__(**data)
+
+    @staticmethod
+    def _populate_devices(
+        raw_devices: List[Dict[str, Any]]
+    ) -> (List[DeviceReadings], List[Dict[str, Any]]):
+        """
+        Populate known devices and document unknown.
+
+        This is a workaround to handle devices that are not known to the library
+        """
+        devices = []
+        unknown_devices = []
+        for raw_device in raw_devices:
+            device_type_name = raw_device.get("deviceType")
+            if device_type := DEVICE_TYPE_MAP.get(device_type_name):
+                try:
+                    devices.append(device_type(**raw_device))
+                except ValidationError as ex:
+                    LOGGER.error("Validation failed: %s", ex)
+                    LOGGER.debug("Device data: %s", raw_device)
+                    unknown_devices.append(raw_device)
+            else:
+                LOGGER.warning("Unknown device type: %s", device_type_name)
+                LOGGER.debug("Device data: %s", raw_device)
+                unknown_devices.append(raw_device)
+
+        return devices, unknown_devices

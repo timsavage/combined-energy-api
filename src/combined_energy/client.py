@@ -1,26 +1,27 @@
+"""Client for API."""
 from __future__ import annotations
 
 import asyncio
+from dataclasses import dataclass
 import datetime
+from importlib import metadata
 import logging
 import socket
-from dataclasses import dataclass
-from importlib import metadata
-from typing import Optional, Dict
 
-import async_timeout
-from aiohttp import ClientSession, ClientResponseError, ClientError
+from aiohttp import ClientError, ClientResponseError, ClientSession
 from aiohttp.hdrs import METH_GET, METH_POST
+import async_timeout
 
 from . import exceptions
+from .constants import LOGGER
 from .models import (
-    ConnectionStatus,
     ConnectionHistory,
-    InstallationCustomers,
-    Installation,
+    ConnectionStatus,
     CurrentUser,
-    Readings,
+    Installation,
+    InstallationCustomers,
     Login,
+    Readings,
 )
 
 USER_ACCESS_HOST = "https://onwatch.combined.energy"
@@ -28,14 +29,10 @@ DATA_ACCESS_HOST = "https://ds20.combined.energy/data-service"
 MQTT_ACCESS_HOST = "https://dp20.combined.energy"
 now = datetime.datetime.now
 
-LOGGER = logging.getLogger(__package__)
-
 
 @dataclass
 class CombinedEnergy:
-    """
-    Client library for Combined Energy API
-    """
+    """Client library for Combined Energy API."""
 
     mobile_or_email: str
     password: str
@@ -46,24 +43,22 @@ class CombinedEnergy:
     request_timeout: float = 10.0
 
     # State
-    session: Optional[ClientSession] = None
+    session: ClientSession | None = None
     _close_session: bool = False
-    _jwt: Optional[str] = None
-    _expires: Optional[datetime] = None
+    _jwt: str | None = None
+    _expires: datetime | None = None
 
     async def _make_request(
         self,
         url: str,
-        params: Dict[str, str] = None,
-        data: Dict[str, str] = None,
+        params: dict[str, str] = None,
+        data: dict[str, str] = None,
         *,
         method: str = METH_GET,
         accept: str = "application/json",
         request_timeout: float = None,
     ):
-        """
-        Handle a request to the Combined Energy API
-        """
+        """Handle a request to the Combined Energy API."""
         version = metadata.version("combined-energy-api")
         headers = {
             "Accept": accept,
@@ -118,17 +113,13 @@ class CombinedEnergy:
         return await response.json()
 
     async def _get_token(self):
-        """
-        Get JWT
-        """
+        """Get JWT."""
         login = await self.login()
         self._jwt = login.jwt
         self._expires = login.expires(self.expiry_window)
 
     async def _ensure_token(self):
-        """
-        Check if token is required
-        """
+        """Check if token is required."""
         if not self._jwt or now() > self._expires:
             LOGGER.info("Login expired; re-login" if self._jwt else "Login required")
             await self._get_token()
@@ -143,10 +134,7 @@ class CombinedEnergy:
     async def user(
         self,
     ) -> CurrentUser:
-        """
-        Get details of current user
-
-        """
+        """Get details of current user."""
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/user",
         )
@@ -155,9 +143,7 @@ class CombinedEnergy:
     async def installation(
         self,
     ) -> Installation:
-        """
-        Get details of installation
-        """
+        """Get details of installation."""
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/installation",
             i=self.installation_id,
@@ -167,10 +153,7 @@ class CombinedEnergy:
     async def installation_customers(
         self,
     ) -> InstallationCustomers:
-        """
-        Get list of customers associated with an installation
-
-        """
+        """Get list of customers associated with an installation."""
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/inst-customers",
             i=self.installation_id,
@@ -179,12 +162,12 @@ class CombinedEnergy:
 
     async def readings(
         self,
-        range_start: Optional[datetime.datetime],
-        range_end: Optional[datetime.datetime],
+        range_start: datetime.datetime | None,
+        range_end: datetime.datetime | None,
         increment: int,
     ) -> Readings:
         """
-        Get readings from system
+        Get readings from system.
 
         :param range_start: Start of readings range
         :param range_end: End of readings range
@@ -197,7 +180,9 @@ class CombinedEnergy:
             rangeEnd=int(range_end.timestamp()) if range_end else "",
             seconds=increment,
         )
-        return Readings.parse_obj(data)
+        readings = Readings.parse_obj(data)
+
+        return readings
 
     async def last_readings(
         self,
@@ -225,9 +210,7 @@ class CombinedEnergy:
     # getTariffDetails: dataHost + "/dataAccess/tariff-details",
 
     async def communication_status(self) -> ConnectionStatus:
-        """
-        Get communication status of the installation
-        """
+        """Get communication status of the installation."""
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/comm-stat",
             i=self.installation_id,
@@ -235,9 +218,7 @@ class CombinedEnergy:
         return ConnectionStatus.parse_obj(data)
 
     async def communication_history(self) -> ConnectionHistory:
-        """
-        Get communication history of the installation
-        """
+        """Get communication history of the installation."""
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/comm-hist",
             i=self.installation_id,
@@ -245,9 +226,7 @@ class CombinedEnergy:
         return ConnectionHistory.parse_obj(data)
 
     async def login(self) -> Login:
-        """
-        Login and obtain a web token
-        """
+        """Login and obtain a web token."""
         data = await self._make_request(
             USER_ACCESS_HOST + "/user/Login",
             data={
@@ -262,9 +241,7 @@ class CombinedEnergy:
         return Login.parse_obj(data)
 
     async def start_log_session(self) -> bool:
-        """
-        Trigger the start of a log session (required if readings stop being supplied)
-        """
+        """Trigger the start of a log session (required if readings stop being supplied)."""
         await self._ensure_token()
 
         try:
@@ -285,15 +262,15 @@ class CombinedEnergy:
             return True  # Assume ok
 
     async def close(self) -> None:
-        """
-        Close open client session.
-        """
+        """Close open client session."""
         if self.session and self._close_session:
             await self.session.close()
             self.session = None
 
     async def __aenter__(self) -> CombinedEnergy:
+        """Async context manager aenter implementation."""
         return self
 
     async def __aexit__(self, *_exc_info):
+        """Async context manager aexit implementation."""
         await self.close()

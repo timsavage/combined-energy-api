@@ -6,16 +6,16 @@ import os
 from combined_energy.client import CombinedEnergy
 from combined_energy.helpers import ReadingsIterator
 
-INSTALL_ID = int(os.getenv("CE_INSTALL_ID", 0))
-
 
 async def main():
+    """Main entry point."""
+
     logging.basicConfig(level=logging.DEBUG)
 
     async with CombinedEnergy(
         mobile_or_email=os.getenv("CE_EMAIL", "user@example.com"),
         password=os.getenv("CE_PASSWORD", "PASSWORD"),
-        installation_id=INSTALL_ID,
+        installation_id=int(os.getenv("CE_INSTALL_ID", 0)),
     ) as combined_energy:
         com_stat = await combined_energy.communication_status()
         print(com_stat)
@@ -23,6 +23,12 @@ async def main():
         async for readings in ReadingsIterator(combined_energy, increment=5):
             print(
                 f"{readings.range_start} - {readings.range_end}: {readings.range_count}"
+            )
+            print(
+                ", ".join(
+                    f"{device.device_type}:{device.device_id}"
+                    for device in readings.devices
+                )
             )
 
             await asyncio.sleep(5)

@@ -416,6 +416,37 @@
         0.00821,
         0.00774
       ]
+    },
+    {
+      "deviceId": 9,
+      "deviceType": "BATTERY",
+      "rangeStart": 1666583415,
+      "rangeEnd": 1666583425,
+      "timestamp": [
+        1666583415,
+        1666583420,
+        1666583425
+      ],
+      "sampleSecs": [
+        5,
+        5,
+        5
+      ],
+      "operationStatus": [
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE",
+        "CONNECTED_ACTIVE"
+      ],
+      "operationMessage": [
+        null,
+        null,
+        null
+      ],
+      "availableEnergy": [
+        450,
+        450,
+        450
+      ]
     }
   ]
 }

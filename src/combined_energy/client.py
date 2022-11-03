@@ -13,6 +13,7 @@ from aiohttp.hdrs import METH_GET, METH_POST
 import async_timeout
 
 from . import exceptions
+from .constants import LOGGER
 from .models import (
     ConnectionHistory,
     ConnectionStatus,
@@ -27,8 +28,6 @@ USER_ACCESS_HOST = "https://onwatch.combined.energy"
 DATA_ACCESS_HOST = "https://ds20.combined.energy/data-service"
 MQTT_ACCESS_HOST = "https://dp20.combined.energy"
 now = datetime.datetime.now
-
-LOGGER = logging.getLogger(__package__)
 
 
 @dataclass
@@ -181,7 +180,9 @@ class CombinedEnergy:
             rangeEnd=int(range_end.timestamp()) if range_end else "",
             seconds=increment,
         )
-        return Readings.parse_obj(data)
+        readings = Readings.parse_obj(data)
+
+        return readings
 
     async def last_readings(
         self,

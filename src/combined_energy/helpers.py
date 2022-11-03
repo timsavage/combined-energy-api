@@ -52,7 +52,7 @@ class ReadingsIterator:
         """
         # Reset if deque is full of True statuses
         if all(self._empty):
-            LOGGER.info("Restart log session...")
+            LOGGER.info("Log session expired, restarting...")
             await self.client.start_log_session()
 
     async def __anext__(self) -> Readings:
@@ -71,5 +71,9 @@ class ReadingsIterator:
 
     async def __aiter__(self) -> AsyncIterator[Readings]:
         """Async iterator implementation."""
+
+        # Start log session up front if required
+        await self.client.start_log_session()
+
         while True:
             yield await self.__anext__()

@@ -98,24 +98,24 @@ class TestReadingsIterator:
         # Check first request
         await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 21)
-        mock_client.start_log_session.assert_not_called()
+        assert mock_client.start_log_session.call_count == 1
 
         # Check second request
         await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 22)
-        mock_client.start_log_session.assert_not_called()
+        assert mock_client.start_log_session.call_count == 1
 
         # Check third request
         await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 22)
-        mock_client.start_log_session.assert_not_called()
+        assert mock_client.start_log_session.call_count == 1
 
         # Check forth request
         await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 22)
-        mock_client.start_log_session.assert_not_called()
+        assert mock_client.start_log_session.call_count == 1
 
         # Check fifth request
         await anext(iterator)
         assert target.next_range_start == datetime(2022, 2, 22, 22, 00, 25)
-        mock_client.start_log_session.assert_called()
+        assert mock_client.start_log_session.call_count == 2

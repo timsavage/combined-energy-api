@@ -3,18 +3,18 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 import aresponses
-import pytest
 from aresponses import ResponsesMockServer
+import pytest
 from yarl import URL
 
 from combined_energy import client
 from combined_energy.models import (
     DeviceReadingsCombiner,
-    DeviceReadingsSolarPV,
-    DeviceReadingsGridMeter,
-    DeviceReadingsGenericConsumer,
-    DeviceReadingsWaterHeater,
     DeviceReadingsEnergyBalance,
+    DeviceReadingsGenericConsumer,
+    DeviceReadingsGridMeter,
+    DeviceReadingsSolarPV,
+    DeviceReadingsWaterHeater,
 )
 
 

@@ -1,5 +1,6 @@
+"""API Schema model."""
 from datetime import datetime, timedelta
-from typing import List, Optional, Dict, Literal, Union
+from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -8,9 +9,7 @@ OptionalFloatList = List[Optional[float]]
 
 
 class Login(BaseModel):
-    """
-    Response from Login
-    """
+    """Response from Login."""
 
     status: str
     expire_minutes: int = Field(alias="expireMins")
@@ -20,22 +19,18 @@ class Login(BaseModel):
     created: datetime = Field(default_factory=now)
 
     def expires(self, expiry_window: int) -> datetime:
-        """
-        Calculate when this login expires
-        """
+        """Calculate when this login expires."""
         offset = timedelta(minutes=self.expire_minutes, seconds=-expiry_window)
         return self.created + offset
 
 
-class CommonModel(BaseModel):
+class _CommonModel(BaseModel):
     status: str
     installation_id: int = Field(alias="installationId")
 
 
 class User(BaseModel):
-    """
-    Individual user
-    """
+    """Individual user."""
 
     type: str
     id: int
@@ -47,27 +42,21 @@ class User(BaseModel):
 
 
 class CurrentUser(BaseModel):
-    """
-    Current logged in user
-    """
+    """Current logged in user."""
 
     status: str
     user: User
 
 
-class ConnectionStatus(CommonModel):
-    """
-    Connection Status of the monitor
-    """
+class ConnectionStatus(_CommonModel):
+    """Connection Status of the monitor."""
 
     connected: bool
     since: datetime
 
 
 class ConnectionHistoryEntry(BaseModel):
-    """
-    Entry in connection history
-    """
+    """Entry in connection history."""
 
     connected: bool
     timestamp: datetime = Field(alias="t")
@@ -76,27 +65,21 @@ class ConnectionHistoryEntry(BaseModel):
 
 
 class ConnectionHistoryRoute(BaseModel):
-    """
-    Route in connection history
-    """
+    """Route in connection history."""
 
     timestamp: datetime = Field(alias="t")
     device: str = Field(alias="d")
 
 
-class ConnectionHistory(CommonModel):
-    """
-    Connection History of the monitor
-    """
+class ConnectionHistory(_CommonModel):
+    """Connection History of the monitor."""
 
     history: List[ConnectionHistoryEntry]
     route: ConnectionHistoryRoute
 
 
 class Device(BaseModel):
-    """
-    Details of a device
-    """
+    """Details of a device."""
 
     device_id: int = Field(alias="deviceId")
     ref_name: str = Field(alias="refName")
@@ -115,10 +98,8 @@ class Device(BaseModel):
     category: str
 
 
-class Installation(CommonModel):
-    """
-    Details of an installation
-    """
+class Installation(_CommonModel):
+    """Details of an installation."""
 
     source: str
     role: str
@@ -149,9 +130,7 @@ class Installation(CommonModel):
 
 
 class Customer(BaseModel):
-    """
-    Individual customer
-    """
+    """Individual customer."""
 
     customer_id: int = Field(alias="customerId")
     phone: Optional[str]
@@ -160,18 +139,14 @@ class Customer(BaseModel):
     primary: bool
 
 
-class InstallationCustomers(CommonModel):
-    """
-    Response from customers
-    """
+class InstallationCustomers(_CommonModel):
+    """Response from customers."""
 
     customers: List[Customer]
 
 
 class DeviceReadings(BaseModel):
-    """
-    Readings for a particular device
-    """
+    """Readings for a particular device."""
 
     device_id: Optional[int] = Field(alias="deviceId")
     range_start: datetime = Field(alias="rangeStart")
@@ -181,10 +156,14 @@ class DeviceReadings(BaseModel):
 
 
 class DeviceReadingsBattery(DeviceReadings):
+    """Placeholder for Battery."""
+
     device_type: Literal["BATTERY"] = Field(alias="deviceType")
 
 
 class DeviceReadingsCombiner(DeviceReadings):
+    """Readings for the Combiner device."""
+
     device_type: Literal["COMBINER"] = Field(alias="deviceType")
 
     energy_supplied: Optional[OptionalFloatList] = Field(alias="energySupplied")
@@ -224,10 +203,14 @@ class DeviceReadingsCombiner(DeviceReadings):
 
 
 class DeviceReadingsSolarPredicted(DeviceReadings):
+    """Placeholder for solar predictions."""
+
     device_type: Literal["SOLAR_PRED"] = Field(alias="deviceType")
 
 
 class DeviceReadingsSolarPV(DeviceReadings):
+    """Readings for the Solar PV device."""
+
     device_type: Literal["SOLAR_PV"] = Field(alias="deviceType")
     operation_status: Optional[List[Optional[str]]] = Field(alias="operationStatus")
     operation_message: Optional[List[Optional[str]]] = Field(alias="operationMessage")
@@ -236,10 +219,14 @@ class DeviceReadingsSolarPV(DeviceReadings):
 
 
 class DeviceReadingsGridMeter(DeviceReadings):
+    """Readings for the Grid Meter device."""
+
     device_type: Literal["GRID_METER"] = Field(alias="deviceType")
 
 
 class DeviceReadingsGenericConsumer(DeviceReadings):
+    """Readings for a Generic consumer device."""
+
     device_type: Literal["GENERIC_CONSUMER"] = Field(alias="deviceType")
     operation_status: Optional[List[Optional[str]]] = Field(alias="operationStatus")
     operation_message: Optional[List[Optional[str]]] = Field(alias="operationMessage")
@@ -253,10 +240,14 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
 
 
 class DeviceReadingsPoolHeater(DeviceReadings):
+    """Placeholder for a pool heater."""
+
     device_type: Literal["POOL_HEATER"] = Field(alias="deviceType")
 
 
 class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
+    """Readings for a Water heater device."""
+
     device_type: Literal["WATER_HEATER"] = Field(alias="deviceType")
 
     available_energy: Optional[OptionalFloatList] = Field(alias="availableEnergy")
@@ -271,13 +262,13 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
 
 
 class DeviceReadingsEnergyBalance(DeviceReadingsGenericConsumer):
+    """Readings for the Energy Balance device."""
+
     device_type: Literal["ENERGY_BALANCE"] = Field(alias="deviceType")
 
 
 class Readings(BaseModel):
-    """
-    Reading history data
-    """
+    """Reading history data."""
 
     range_start: datetime = Field(alias="rangeStart")
     range_end: datetime = Field(alias="rangeEnd")

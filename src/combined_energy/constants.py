@@ -1,7 +1,10 @@
+"""Constants used by API."""
 from enum import Enum
 
 
 class DeviceType(str, Enum):
+    """Type of device."""
+
     Battery = "BATTERY"
     Combiner = "COMBINER"
     Receiver = "DRED_RECEIVER"  # Not sure what this is
@@ -18,6 +21,8 @@ class DeviceType(str, Enum):
 
 
 class Category(str, Enum):
+    """Category of device."""
+
     Airconditioner = "AIRCON"
     Battery = "BATTERY"
     Building = "BUILDING"

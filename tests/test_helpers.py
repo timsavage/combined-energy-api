@@ -1,15 +1,14 @@
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock
-
+from unittest.mock import AsyncMock, Mock
 
 try:
     from builtins import aiter, anext
 except ImportError:
-    from typing import AsyncIterable, AsyncIterator, TypeVar, Awaitable
+    from typing import AsyncIterable, AsyncIterator, Awaitable, TypeVar
 
     _T = TypeVar("_T")
 
-    def aiter(iterable: AsyncIterable) -> AsyncIterator:
+    def aiter(iterable: AsyncIterable[_T]) -> AsyncIterator[_T]:
         """Return an AsyncIterator for an AsyncIterable object."""
         return iterable.__aiter__()
 

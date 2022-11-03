@@ -1,6 +1,6 @@
 """API Schema model."""
 from datetime import datetime, timedelta
-from typing import Any, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, ValidationError
 
@@ -76,7 +76,7 @@ class ConnectionHistoryRoute(BaseModel):
 class ConnectionHistory(_CommonModel):
     """Connection History of the monitor."""
 
-    history: list[ConnectionHistoryEntry]
+    history: List[ConnectionHistoryEntry]
     route: ConnectionHistoryRoute
 
 
@@ -107,7 +107,7 @@ class Installation(_CommonModel):
     role: str
     read_only: bool = Field(alias="readOnly")
     dmg_id: int = Field(alias="dmgId")
-    tags: list[str]
+    tags: List[str]
 
     mqtt_account_kura: str = Field(alias="mqttAccountKura")
     mqtt_broker_ems: str = Field(alias="mqttBrokerEms")
@@ -127,8 +127,8 @@ class Installation(_CommonModel):
     tariff_plan_id: int = Field(alias="tariffPlanId")
     tariff_plan_accepted: int = Field(alias="tariffPlanAccepted")
 
-    devices: list[Device]
-    pm: dict[str, list[dict]]
+    devices: List[Device]
+    pm: Dict[str, List[dict]]
 
 
 class Customer(BaseModel):
@@ -144,7 +144,7 @@ class Customer(BaseModel):
 class InstallationCustomers(_CommonModel):
     """Response from customers."""
 
-    customers: list[Customer]
+    customers: List[Customer]
 
 
 class DeviceReadings(BaseModel):
@@ -153,8 +153,8 @@ class DeviceReadings(BaseModel):
     device_id: Optional[int] = Field(alias="deviceId")
     range_start: Optional[datetime] = Field(alias="rangeStart")
     range_end: Optional[datetime] = Field(alias="rangeEnd")
-    timestamp: list[datetime]
-    sample_seconds: Optional[list[int]] = Field(alias="sampleSecs")
+    timestamp: List[datetime]
+    sample_seconds: Optional[List[int]] = Field(alias="sampleSecs")
 
 
 class DeviceReadingsCombiner(DeviceReadings):
@@ -202,10 +202,10 @@ class DeviceReadingsSolarPV(DeviceReadings):
     """Readings for the Solar PV device."""
 
     device_type: Literal["SOLAR_PV"] = Field(alias="deviceType")
-    operation_status: Optional[list[Optional[str]]] = Field(alias="operationStatus")
-    operation_message: Optional[list[Optional[str]]] = Field(alias="operationMessage")
+    operation_status: Optional[List[Optional[str]]] = Field(alias="operationStatus")
+    operation_message: Optional[List[Optional[str]]] = Field(alias="operationMessage")
 
-    energy_supplied: Optional[list[float]] = Field(alias="energySupplied")
+    energy_supplied: Optional[List[float]] = Field(alias="energySupplied")
 
 
 class DeviceReadingsGridMeter(DeviceReadings):
@@ -218,15 +218,15 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
     """Readings for a Generic consumer device."""
 
     device_type: Literal["GENERIC_CONSUMER"] = Field(alias="deviceType")
-    operation_status: Optional[list[Optional[str]]] = Field(alias="operationStatus")
-    operation_message: Optional[list[Optional[str]]] = Field(alias="operationMessage")
+    operation_status: Optional[List[Optional[str]]] = Field(alias="operationStatus")
+    operation_message: Optional[List[Optional[str]]] = Field(alias="operationMessage")
 
-    energy_consumed: Optional[list[float]] = Field(alias="energyConsumed")
-    energy_consumed_solar: Optional[list[float]] = Field(alias="energyConsumedSolar")
-    energy_consumed_battery: Optional[list[float]] = Field(
+    energy_consumed: Optional[List[float]] = Field(alias="energyConsumed")
+    energy_consumed_solar: Optional[List[float]] = Field(alias="energyConsumedSolar")
+    energy_consumed_battery: Optional[List[float]] = Field(
         alias="energyConsumedBattery"
     )
-    energy_consumed_grid: Optional[list[float]] = Field(alias="energyConsumedGrid")
+    energy_consumed_grid: Optional[List[float]] = Field(alias="energyConsumedGrid")
 
 
 class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
@@ -242,7 +242,7 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
     temp_sensor4: Optional[OptionalFloatList] = Field(alias="s4")
     temp_sensor5: Optional[OptionalFloatList] = Field(alias="s5")
     temp_sensor6: Optional[OptionalFloatList] = Field(alias="s6")
-    water_heater_status: Optional[list[Optional[str]]] = Field(alias="whStatus")
+    water_heater_status: Optional[List[Optional[str]]] = Field(alias="whStatus")
 
 
 class DeviceReadingsEnergyBalance(DeviceReadingsGenericConsumer):
@@ -271,8 +271,8 @@ class Readings(BaseModel):
     installation_id: int = Field(alias="installationId")
     server_time: datetime = Field(alias="serverTime")
 
-    devices: list[DeviceReadings]
-    unknown_devices: list[dict[str, Any]]
+    devices: List[DeviceReadings]
+    unknown_devices: List[Dict[str, Any]]
 
     def __init__(self, **data):
         """Initialise readings and pre-process devices."""
@@ -282,8 +282,8 @@ class Readings(BaseModel):
 
     @staticmethod
     def _populate_devices(
-        raw_devices: list[dict[str, Any]]
-    ) -> (list[DeviceReadings], list[dict[str, Any]]):
+        raw_devices: List[Dict[str, Any]]
+    ) -> (List[DeviceReadings], List[Dict[str, Any]]):
         """
         Populate known devices and document unknown.
 

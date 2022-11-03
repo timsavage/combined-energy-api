@@ -1,6 +1,4 @@
 """API Schema model."""
-from __future__ import annotations
-
 from datetime import datetime, timedelta
 from typing import Any, List, Literal, Optional
 
@@ -42,7 +40,7 @@ class User(BaseModel):
     mobile: str
     fullname: str
     dsa_ok: bool = Field(alias="dsaOk")
-    show_introduction: str | None = Field(alias="showIntroduction")
+    show_introduction: Optional[str] = Field(alias="showIntroduction")
 
 
 class CurrentUser(BaseModel):
@@ -89,16 +87,16 @@ class Device(BaseModel):
     ref_name: str = Field(alias="refName")
     display_name: str = Field(alias="displayName")
     device_type: str = Field(alias="deviceType")
-    device_manufacturer: str | None = Field(alias="deviceManufacturer")
-    device_model_name: str | None = Field(alias="deviceModelName")
+    device_manufacturer: Optional[str] = Field(alias="deviceManufacturer")
+    device_model_name: Optional[str] = Field(alias="deviceModelName")
     supplier_device: bool = Field(alias="supplierDevice")
     storage_device: bool = Field(alias="storageDevice")
     consumer_device: bool = Field(alias="consumerDevice")
     status: str
-    max_power_supply: int | None = Field(alias="maxPowerSupply")
-    max_power_consumption: int | None = Field(alias="maxPowerConsumption")
-    icon_override: str | None = Field(alias="iconOverride")
-    order_override: int | None = Field(alias="orderOverride")
+    max_power_supply: Optional[int] = Field(alias="maxPowerSupply")
+    max_power_consumption: Optional[int] = Field(alias="maxPowerConsumption")
+    icon_override: Optional[str] = Field(alias="iconOverride")
+    order_override: Optional[int] = Field(alias="orderOverride")
     category: str
 
 
@@ -137,7 +135,7 @@ class Customer(BaseModel):
     """Individual customer."""
 
     customer_id: int = Field(alias="customerId")
-    phone: str | None
+    phone: Optional[str]
     email: str
     name: str
     primary: bool
@@ -152,11 +150,11 @@ class InstallationCustomers(_CommonModel):
 class DeviceReadings(BaseModel):
     """Readings for a particular device."""
 
-    device_id: int | None = Field(alias="deviceId")
-    range_start: datetime | None = Field(alias="rangeStart")
-    range_end: datetime | None = Field(alias="rangeEnd")
+    device_id: Optional[int] = Field(alias="deviceId")
+    range_start: Optional[datetime] = Field(alias="rangeStart")
+    range_end: Optional[datetime] = Field(alias="rangeEnd")
     timestamp: list[datetime]
-    sample_seconds: list[int] | None = Field(alias="sampleSecs")
+    sample_seconds: Optional[list[int]] = Field(alias="sampleSecs")
 
 
 class DeviceReadingsCombiner(DeviceReadings):
@@ -164,40 +162,50 @@ class DeviceReadingsCombiner(DeviceReadings):
 
     device_type: Literal["COMBINER"] = Field(alias="deviceType")
 
-    energy_supplied: OptionalFloatList | None = Field(alias="energySupplied")
-    energy_supplied_solar: OptionalFloatList | None = Field(alias="energySuppliedSolar")
-    energy_supplied_battery: OptionalFloatList | None = Field(
+    energy_supplied: Optional[OptionalFloatList] = Field(alias="energySupplied")
+    energy_supplied_solar: Optional[OptionalFloatList] = Field(
+        alias="energySuppliedSolar"
+    )
+    energy_supplied_battery: Optional[OptionalFloatList] = Field(
         alias="energySuppliedBattery"
     )
-    energy_supplied_grid: OptionalFloatList | None = Field(alias="energySuppliedGrid")
-    energy_consumed_other: OptionalFloatList | None = Field(alias="energyConsumedOther")
-    energy_consumed_other_solar: OptionalFloatList | None = Field(
+    energy_supplied_grid: Optional[OptionalFloatList] = Field(
+        alias="energySuppliedGrid"
+    )
+    energy_consumed_other: Optional[OptionalFloatList] = Field(
+        alias="energyConsumedOther"
+    )
+    energy_consumed_other_solar: Optional[OptionalFloatList] = Field(
         alias="energyConsumedOtherSolar"
     )
-    energy_consumed_other_battery: OptionalFloatList | None = Field(
+    energy_consumed_other_battery: Optional[OptionalFloatList] = Field(
         alias="energyConsumedOtherBattery"
     )
-    energy_consumed_other_grid: OptionalFloatList | None = Field(
+    energy_consumed_other_grid: Optional[OptionalFloatList] = Field(
         alias="energyConsumedOtherGrid"
     )
-    energy_consumed: OptionalFloatList | None = Field(alias="energyConsumed")
-    energy_consumed_solar: OptionalFloatList | None = Field(alias="energyConsumedSolar")
-    energy_consumed_battery: OptionalFloatList | None = Field(
+    energy_consumed: Optional[OptionalFloatList] = Field(alias="energyConsumed")
+    energy_consumed_solar: Optional[OptionalFloatList] = Field(
+        alias="energyConsumedSolar"
+    )
+    energy_consumed_battery: Optional[OptionalFloatList] = Field(
         alias="energyConsumedBattery"
     )
-    energy_consumed_grid: OptionalFloatList | None = Field(alias="energyConsumedGrid")
-    energy_correction: OptionalFloatList | None = Field(alias="energyCorrection")
-    temperature: OptionalFloatList | None
+    energy_consumed_grid: Optional[OptionalFloatList] = Field(
+        alias="energyConsumedGrid"
+    )
+    energy_correction: Optional[OptionalFloatList] = Field(alias="energyCorrection")
+    temperature: Optional[OptionalFloatList]
 
 
 class DeviceReadingsSolarPV(DeviceReadings):
     """Readings for the Solar PV device."""
 
     device_type: Literal["SOLAR_PV"] = Field(alias="deviceType")
-    operation_status: list[str | None] | None = Field(alias="operationStatus")
-    operation_message: list[str | None] | None = Field(alias="operationMessage")
+    operation_status: Optional[list[Optional[str]]] = Field(alias="operationStatus")
+    operation_message: Optional[list[Optional[str]]] = Field(alias="operationMessage")
 
-    energy_supplied: list[float] | None = Field(alias="energySupplied")
+    energy_supplied: Optional[list[float]] = Field(alias="energySupplied")
 
 
 class DeviceReadingsGridMeter(DeviceReadings):
@@ -210,13 +218,15 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
     """Readings for a Generic consumer device."""
 
     device_type: Literal["GENERIC_CONSUMER"] = Field(alias="deviceType")
-    operation_status: list[str | None] | None = Field(alias="operationStatus")
-    operation_message: list[str | None] | None = Field(alias="operationMessage")
+    operation_status: Optional[list[Optional[str]]] = Field(alias="operationStatus")
+    operation_message: Optional[list[Optional[str]]] = Field(alias="operationMessage")
 
-    energy_consumed: list[float] | None = Field(alias="energyConsumed")
-    energy_consumed_solar: list[float] | None = Field(alias="energyConsumedSolar")
-    energy_consumed_battery: list[float] | None = Field(alias="energyConsumedBattery")
-    energy_consumed_grid: list[float] | None = Field(alias="energyConsumedGrid")
+    energy_consumed: Optional[list[float]] = Field(alias="energyConsumed")
+    energy_consumed_solar: Optional[list[float]] = Field(alias="energyConsumedSolar")
+    energy_consumed_battery: Optional[list[float]] = Field(
+        alias="energyConsumedBattery"
+    )
+    energy_consumed_grid: Optional[list[float]] = Field(alias="energyConsumedGrid")
 
 
 class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
@@ -224,15 +234,15 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
 
     device_type: Literal["WATER_HEATER"] = Field(alias="deviceType")
 
-    available_energy: OptionalFloatList | None = Field(alias="availableEnergy")
-    max_energy: OptionalFloatList | None = Field(alias="maxEnergy")
-    temp_sensor1: OptionalFloatList | None = Field(alias="s1")
-    temp_sensor2: OptionalFloatList | None = Field(alias="s2")
-    temp_sensor3: OptionalFloatList | None = Field(alias="s3")
-    temp_sensor4: OptionalFloatList | None = Field(alias="s4")
-    temp_sensor5: OptionalFloatList | None = Field(alias="s5")
-    temp_sensor6: OptionalFloatList | None = Field(alias="s6")
-    water_heater_status: list[str | None] | None = Field(alias="whStatus")
+    available_energy: Optional[OptionalFloatList] = Field(alias="availableEnergy")
+    max_energy: Optional[OptionalFloatList] = Field(alias="maxEnergy")
+    temp_sensor1: Optional[OptionalFloatList] = Field(alias="s1")
+    temp_sensor2: Optional[OptionalFloatList] = Field(alias="s2")
+    temp_sensor3: Optional[OptionalFloatList] = Field(alias="s3")
+    temp_sensor4: Optional[OptionalFloatList] = Field(alias="s4")
+    temp_sensor5: Optional[OptionalFloatList] = Field(alias="s5")
+    temp_sensor6: Optional[OptionalFloatList] = Field(alias="s6")
+    water_heater_status: Optional[list[Optional[str]]] = Field(alias="whStatus")
 
 
 class DeviceReadingsEnergyBalance(DeviceReadingsGenericConsumer):

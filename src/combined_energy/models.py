@@ -8,6 +8,7 @@ from .constants import LOGGER, DeviceType
 
 now = datetime.now
 OptionalFloatList = List[Optional[float]]
+OptionalStrList = List[Optional[str]]
 
 
 class Login(BaseModel):
@@ -212,6 +213,21 @@ class DeviceReadingsGridMeter(DeviceReadings):
     """Readings for the Grid Meter device."""
 
     device_type: Literal["GRID_METER"] = Field(alias="deviceType")
+    operation_status: Optional[List[Optional[str]]] = Field(alias="operationStatus")
+    operation_message: Optional[List[Optional[str]]] = Field(alias="operationMessage")
+
+    energy_supplied: Optional[List[float]] = Field(alias="energySupplied")
+    energy_consumed: Optional[List[float]] = Field(alias="energyConsumed")
+    energy_consumed_solar: Optional[List[float]] = Field(alias="energyConsumedSolar")
+    energy_consumed_battery: Optional[List[float]] = Field(
+        alias="energyConsumedBattery"
+    )
+    power_factor_a: Optional[OptionalFloatList] = Field(alias="powerFactorA")
+    power_factor_b: Optional[OptionalFloatList] = Field(alias="powerFactorB")
+    power_factor_c: Optional[OptionalFloatList] = Field(alias="powerFactorC")
+    voltage_a: Optional[OptionalFloatList] = Field(alias="voltageA")
+    voltage_b: Optional[OptionalFloatList] = Field(alias="voltageB")
+    voltage_c: Optional[OptionalFloatList] = Field(alias="voltageC")
 
 
 class DeviceReadingsGenericConsumer(DeviceReadings):

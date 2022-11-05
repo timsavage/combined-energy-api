@@ -1,8 +1,8 @@
 # Example that reads the communication status and fetches readings
 import asyncio
+from datetime import timedelta
 import logging
 import os
-from datetime import timedelta
 
 from combined_energy.client import CombinedEnergy
 from combined_energy.helpers import ReadingsIterator

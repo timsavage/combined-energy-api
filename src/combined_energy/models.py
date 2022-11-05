@@ -1,6 +1,6 @@
 """API Schema model."""
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Literal, Optional, Callable
+from typing import Any, Callable, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, ValidationError
 
@@ -158,11 +158,11 @@ class DeviceReadings(BaseModel):
     sample_seconds: Optional[List[int]] = Field(alias="sampleSecs")
 
 
-def device_energy_sample_to_power(
+def _device_energy_sample_to_power(
     attribute: str, *, sample_index: int = -1
 ) -> Callable[[DeviceReadings], Optional[float]]:
     def _energy_sample_as_power(self: DeviceReadings) -> Optional[float]:
-        """Current power consumption; this is the latest energy consumed converted to kW."""
+        """Generate a power instantaneous power figure in kW."""
         if self.sample_seconds:
             energy_samples = getattr(self, attribute)
             return energy_to_power(
@@ -232,7 +232,7 @@ class DeviceReadingsSolarPV(DeviceReadings):
 
     @property
     def power_supplied(self) -> Optional[float]:
-        """Current power generation; this is the latest energy supplied converted to kW."""
+        """Generate instantaneous power generation figure in kW."""
         if self.sample_seconds:
             return energy_to_power(self.energy_supplied[-1], self.sample_seconds[-1])
 
@@ -263,13 +263,13 @@ class DeviceReadingsGridMeter(DeviceReadings):
             return "_.__kW (S: _.__kW; B: _.__kW)"
 
     power_consumption: Optional[float] = property(
-        device_energy_sample_to_power("energy_consumed")
+        _device_energy_sample_to_power("energy_consumed")
     )
     power_consumption_solar: Optional[float] = property(
-        device_energy_sample_to_power("energy_consumed_solar")
+        _device_energy_sample_to_power("energy_consumed_solar")
     )
     power_consumption_battery: Optional[float] = property(
-        device_energy_sample_to_power("energy_consumed_battery")
+        _device_energy_sample_to_power("energy_consumed_battery")
     )
 
 
@@ -301,16 +301,16 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
             return "_.__kW (S: _.__kW; G: _.__kW; B: _.__kW)"
 
     power_consumption: Optional[float] = property(
-        device_energy_sample_to_power("energy_consumed")
+        _device_energy_sample_to_power("energy_consumed")
     )
     power_consumption_solar: Optional[float] = property(
-        device_energy_sample_to_power("energy_consumed_solar")
+        _device_energy_sample_to_power("energy_consumed_solar")
     )
     power_consumption_battery: Optional[float] = property(
-        device_energy_sample_to_power("energy_consumed_battery")
+        _device_energy_sample_to_power("energy_consumed_battery")
     )
     power_consumption_grid: Optional[float] = property(
-        device_energy_sample_to_power("energy_consumed_grid")
+        _device_energy_sample_to_power("energy_consumed_grid")
     )
 
 
@@ -330,16 +330,39 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
     water_heater_status: Optional[List[Optional[str]]] = Field(alias="whStatus")
 
     def __str__(self):
+        """Convert instance to string."""
         if self.sample_seconds:
-            return f"{super().__str__()}; Available {self.available_energy[-1]}l ({self.energy_ratio:02.0f}%)"
+            return (
+                f"{super().__str__()}; "
+                f"Available {self.available_energy[-1]}l ({self.energy_ratio:02.0f}%); "
+                f"Temp: {self.output_temp:02.01f}℃"
+            )
         else:
-            return f"{super().__str__()}; Available _l (__%)"
+            return f"{super().__str__()}; Available _l (__%); Temp: __℃"
 
     @property
-    def energy_ratio(self):
+    def energy_ratio(self) -> Optional[float]:
         """Ratio of energy available; in %."""
         if self.sample_seconds:
             return (self.available_energy[-1] / self.max_energy[-1]) * 100
+
+    @property
+    def output_temp(self) -> Optional[float]:
+        """Output temperature of water.
+
+        This is the max temp of available sensors.
+        """
+        if self.sample_seconds:
+            return max(
+                [
+                    self.temp_sensor1[-1],
+                    self.temp_sensor2[-1],
+                    self.temp_sensor3[-1],
+                    self.temp_sensor4[-1],
+                    self.temp_sensor5[-1],
+                    self.temp_sensor6[-1],
+                ]
+            )
 
 
 class DeviceReadingsEnergyBalance(DeviceReadingsGenericConsumer):

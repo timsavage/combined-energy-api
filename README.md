@@ -54,3 +54,6 @@ You will need:
 
 - Python 3.8+
 - poetry
+- pre-commit
+
+Ensure pre-commit is installed into your git repository with `pre-commit install`. 

@@ -1,13 +1,15 @@
 """API Schema model."""
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, ValidationError
 
 from .constants import LOGGER, DeviceType
+from .utils import energy_to_power
 
 now = datetime.now
 OptionalFloatList = List[Optional[float]]
+OptionalStrList = List[Optional[str]]
 
 
 class Login(BaseModel):
@@ -157,6 +159,21 @@ class DeviceReadings(BaseModel):
     sample_seconds: Optional[List[int]] = Field(alias="sampleSecs")
 
 
+def _device_energy_sample_to_power(
+    attribute: str, *, sample_index: int = -1
+) -> Callable[[DeviceReadings], Optional[float]]:
+    def _energy_sample_as_power(self: DeviceReadings) -> Optional[float]:
+        """Generate a power instantaneous power figure in kW."""
+        if self.sample_seconds:
+            energy_samples = getattr(self, attribute)
+            return energy_to_power(
+                energy_samples[sample_index],
+                self.sample_seconds[sample_index],
+            )
+
+    return _energy_sample_as_power
+
+
 class DeviceReadingsCombiner(DeviceReadings):
     """Readings for the Combiner device."""
 
@@ -207,11 +224,65 @@ class DeviceReadingsSolarPV(DeviceReadings):
 
     energy_supplied: Optional[List[float]] = Field(alias="energySupplied")
 
+    # Calculate power figures
+    power_supply: Optional[float] = property(
+        _device_energy_sample_to_power("energy_supplied")
+    )
+
+    def __str__(self) -> str:
+        """Convert self to a string representation."""
+        if self.sample_seconds:
+            return f"Generation: {self.power_supply:0.02f}kW"
+        else:
+            return "_.__kW"
+
 
 class DeviceReadingsGridMeter(DeviceReadings):
     """Readings for the Grid Meter device."""
 
     device_type: Literal["GRID_METER"] = Field(alias="deviceType")
+    operation_status: Optional[List[Optional[str]]] = Field(alias="operationStatus")
+    operation_message: Optional[List[Optional[str]]] = Field(alias="operationMessage")
+
+    energy_supplied: Optional[List[float]] = Field(alias="energySupplied")
+    energy_consumed: Optional[List[float]] = Field(alias="energyConsumed")
+    energy_consumed_solar: Optional[List[float]] = Field(alias="energyConsumedSolar")
+    energy_consumed_battery: Optional[List[float]] = Field(
+        alias="energyConsumedBattery"
+    )
+    power_factor_a: Optional[OptionalFloatList] = Field(alias="powerFactorA")
+    power_factor_b: Optional[OptionalFloatList] = Field(alias="powerFactorB")
+    power_factor_c: Optional[OptionalFloatList] = Field(alias="powerFactorC")
+    voltage_a: Optional[OptionalFloatList] = Field(alias="voltageA")
+    voltage_b: Optional[OptionalFloatList] = Field(alias="voltageB")
+    voltage_c: Optional[OptionalFloatList] = Field(alias="voltageC")
+
+    # Calculate power figures
+    power_supply: Optional[float] = property(
+        _device_energy_sample_to_power("energy_supplied")
+    )
+    power_consumption: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed")
+    )
+    power_consumption_solar: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed_solar")
+    )
+    power_consumption_battery: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed_battery")
+    )
+
+    def __str__(self) -> str:
+        """Convert self to a string representation."""
+        if self.sample_seconds:
+            return (
+                f"Import: {self.power_supply:0.02f}kW; "
+                f"Export: {self.power_consumption:0.02f}kW ("
+                f"Solar: {self.power_consumption_solar:0.02f}kW; "
+                f"Battery: {self.power_consumption_battery:0.02f}kW"
+                f")"
+            )
+        else:
+            return "Import: _.__kW; Export: _.__kW (Solar: _.__kW; Battery: _.__kW)"
 
 
 class DeviceReadingsGenericConsumer(DeviceReadings):
@@ -228,6 +299,33 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
     )
     energy_consumed_grid: Optional[List[float]] = Field(alias="energyConsumedGrid")
 
+    # Calculate power figures
+    power_consumption: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed")
+    )
+    power_consumption_solar: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed_solar")
+    )
+    power_consumption_battery: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed_battery")
+    )
+    power_consumption_grid: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed_grid")
+    )
+
+    def __str__(self) -> str:
+        """Convert self to a string representation."""
+        if self.sample_seconds:
+            return (
+                f"Consumption: {self.power_consumption:0.02f}kW ("
+                f"Solar: {self.power_consumption_solar:0.02f}kW; "
+                f"Battery: {self.power_consumption_battery:0.02f}kW; "
+                f"Grid: {self.power_consumption_grid:0.02f}kW"
+                f")"
+            )
+        else:
+            return "_.__kW (S: _.__kW; G: _.__kW; B: _.__kW)"
+
 
 class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
     """Readings for a Water heater device."""
@@ -243,6 +341,41 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
     temp_sensor5: Optional[OptionalFloatList] = Field(alias="s5")
     temp_sensor6: Optional[OptionalFloatList] = Field(alias="s6")
     water_heater_status: Optional[List[Optional[str]]] = Field(alias="whStatus")
+
+    def __str__(self):
+        """Convert instance to string."""
+        if self.sample_seconds:
+            return (
+                f"{super().__str__()}; "
+                f"Available: {self.available_energy[-1]}l ({self.energy_ratio:02.0f}%); "
+                f"Temp: {self.output_temp:02.01f}℃"
+            )
+        else:
+            return f"{super().__str__()}; Available _l (__%); Temp: __℃"
+
+    @property
+    def energy_ratio(self) -> Optional[float]:
+        """Ratio of energy available; in %."""
+        if self.sample_seconds:
+            return round((self.available_energy[-1] / self.max_energy[-1]) * 100, 1)
+
+    @property
+    def output_temp(self) -> Optional[float]:
+        """Output temperature of water.
+
+        This is the max temp of available sensors.
+        """
+        if self.sample_seconds:
+            return max(
+                [
+                    self.temp_sensor1[-1],
+                    self.temp_sensor2[-1],
+                    self.temp_sensor3[-1],
+                    self.temp_sensor4[-1],
+                    self.temp_sensor5[-1],
+                    self.temp_sensor6[-1],
+                ]
+            )
 
 
 class DeviceReadingsEnergyBalance(DeviceReadingsGenericConsumer):

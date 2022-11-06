@@ -224,18 +224,17 @@ class DeviceReadingsSolarPV(DeviceReadings):
 
     energy_supplied: Optional[List[float]] = Field(alias="energySupplied")
 
+    # Calculate power figures
+    power_supply: Optional[float] = property(
+        _device_energy_sample_to_power("energy_supplied")
+    )
+
     def __str__(self) -> str:
         """Convert self to a string representation."""
-        if self.energy_supplied:
-            return f"{self.power_supplied:0.02f}kW"
+        if self.sample_seconds:
+            return f"Generation: {self.power_supply:0.02f}kW"
         else:
             return "_.__kW"
-
-    @property
-    def power_supplied(self) -> Optional[float]:
-        """Generate instantaneous power generation figure in kW."""
-        if self.sample_seconds:
-            return energy_to_power(self.energy_supplied[-1], self.sample_seconds[-1])
 
 
 class DeviceReadingsGridMeter(DeviceReadings):
@@ -258,46 +257,32 @@ class DeviceReadingsGridMeter(DeviceReadings):
     voltage_b: Optional[OptionalFloatList] = Field(alias="voltageB")
     voltage_c: Optional[OptionalFloatList] = Field(alias="voltageC")
 
+    # Calculate power figures
+    power_supply: Optional[float] = property(
+        _device_energy_sample_to_power("energy_supplied")
+    )
+    power_consumption: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed")
+    )
+    power_consumption_solar: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed_solar")
+    )
+    power_consumption_battery: Optional[float] = property(
+        _device_energy_sample_to_power("energy_consumed_battery")
+    )
+
     def __str__(self) -> str:
         """Convert self to a string representation."""
         if self.sample_seconds:
             return (
-                f"Imported: {self.power_imported:0.02f}kW; "
-                f"Exported: {self.power_exported:0.02f}kW ("
-                f"S: {self.power_exported_solar:0.02f}kW; "
-                f"B: {self.power_exported_battery:0.02f}kW"
+                f"Import: {self.power_supply:0.02f}kW; "
+                f"Export: {self.power_consumption:0.02f}kW ("
+                f"Solar: {self.power_consumption_solar:0.02f}kW; "
+                f"Battery: {self.power_consumption_battery:0.02f}kW"
                 f")"
             )
         else:
-            return "_.__kW (S: _.__kW; B: _.__kW)"
-
-    power_imported: Optional[float] = property(
-        _device_energy_sample_to_power("energy_supplied")
-    )
-    power_exported: Optional[float] = property(
-        _device_energy_sample_to_power("energy_consumed")
-    )
-    power_exported_solar: Optional[float] = property(
-        _device_energy_sample_to_power("energy_consumed_solar")
-    )
-    power_exported_battery: Optional[float] = property(
-        _device_energy_sample_to_power("energy_consumed_battery")
-    )
-    operation_status: Optional[List[Optional[str]]] = Field(alias="operationStatus")
-    operation_message: Optional[List[Optional[str]]] = Field(alias="operationMessage")
-
-    energy_supplied: Optional[List[float]] = Field(alias="energySupplied")
-    energy_consumed: Optional[List[float]] = Field(alias="energyConsumed")
-    energy_consumed_solar: Optional[List[float]] = Field(alias="energyConsumedSolar")
-    energy_consumed_battery: Optional[List[float]] = Field(
-        alias="energyConsumedBattery"
-    )
-    power_factor_a: Optional[OptionalFloatList] = Field(alias="powerFactorA")
-    power_factor_b: Optional[OptionalFloatList] = Field(alias="powerFactorB")
-    power_factor_c: Optional[OptionalFloatList] = Field(alias="powerFactorC")
-    voltage_a: Optional[OptionalFloatList] = Field(alias="voltageA")
-    voltage_b: Optional[OptionalFloatList] = Field(alias="voltageB")
-    voltage_c: Optional[OptionalFloatList] = Field(alias="voltageC")
+            return "Import: _.__kW; Export: _.__kW (Solar: _.__kW; Battery: _.__kW)"
 
 
 class DeviceReadingsGenericConsumer(DeviceReadings):
@@ -314,19 +299,7 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
     )
     energy_consumed_grid: Optional[List[float]] = Field(alias="energyConsumedGrid")
 
-    def __str__(self) -> str:
-        """Convert self to a string representation."""
-        if self.energy_consumed:
-            return (
-                f"{self.power_consumption:0.02f}kW ("
-                f"S: {self.power_consumption_solar:0.02f}kW; "
-                f"G: {self.power_consumption_grid:0.02f}kW; "
-                f"B: {self.power_consumption_battery:0.02f}kW"
-                f")"
-            )
-        else:
-            return "_.__kW (S: _.__kW; G: _.__kW; B: _.__kW)"
-
+    # Calculate power figures
     power_consumption: Optional[float] = property(
         _device_energy_sample_to_power("energy_consumed")
     )
@@ -339,6 +312,19 @@ class DeviceReadingsGenericConsumer(DeviceReadings):
     power_consumption_grid: Optional[float] = property(
         _device_energy_sample_to_power("energy_consumed_grid")
     )
+
+    def __str__(self) -> str:
+        """Convert self to a string representation."""
+        if self.sample_seconds:
+            return (
+                f"Consumption: {self.power_consumption:0.02f}kW ("
+                f"Solar: {self.power_consumption_solar:0.02f}kW; "
+                f"Battery: {self.power_consumption_battery:0.02f}kW; "
+                f"Grid: {self.power_consumption_grid:0.02f}kW"
+                f")"
+            )
+        else:
+            return "_.__kW (S: _.__kW; G: _.__kW; B: _.__kW)"
 
 
 class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
@@ -361,7 +347,7 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
         if self.sample_seconds:
             return (
                 f"{super().__str__()}; "
-                f"Available {self.available_energy[-1]}l ({self.energy_ratio:02.0f}%); "
+                f"Available: {self.available_energy[-1]}l ({self.energy_ratio:02.0f}%); "
                 f"Temp: {self.output_temp:02.01f}℃"
             )
         else:

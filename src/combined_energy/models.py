@@ -357,7 +357,7 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
     def energy_ratio(self) -> Optional[float]:
         """Ratio of energy available; in %."""
         if self.sample_seconds:
-            return (self.available_energy[-1] / self.max_energy[-1]) * 100
+            return round((self.available_energy[-1] / self.max_energy[-1]) * 100, 1)
 
     @property
     def output_temp(self) -> Optional[float]:

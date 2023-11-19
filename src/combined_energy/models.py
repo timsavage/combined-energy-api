@@ -340,7 +340,9 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
     temp_sensor4: Optional[OptionalFloatList] = Field(alias="s4")
     temp_sensor5: Optional[OptionalFloatList] = Field(alias="s5")
     temp_sensor6: Optional[OptionalFloatList] = Field(alias="s6")
-    water_heater_status: Optional[List[Optional[str]]] = Field(alias="whStatus")
+    water_heater_status: Optional[List[Optional[Dict[str, Any]]]] = Field(
+        alias="whStatus"
+    )
 
     def __str__(self):
         """Convert instance to string."""
@@ -417,8 +419,7 @@ class Readings(BaseModel):
     def _populate_devices(
         raw_devices: List[Dict[str, Any]]
     ) -> (List[DeviceReadings], List[Dict[str, Any]]):
-        """
-        Populate known devices and document unknown.
+        """Populate known devices and document unknown.
 
         This is a workaround to handle devices that are not known to the library
         """

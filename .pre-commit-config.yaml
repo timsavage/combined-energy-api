@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.1.0
+    rev: v3.15.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -14,22 +14,15 @@ repos:
           - --quiet
         files: ^((src|example|tests)/.+)?[^/]+\.py$
 
-  - repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.1
     hooks:
-      - id: flake8
-        additional_dependencies:
-          - pycodestyle==2.8.0
-          - pyflakes==2.4.0
-          - flake8-docstrings==1.6.0
-          - pydocstyle==6.1.1
-          - flake8-comprehensions==3.10.0
-          - flake8-noqa==1.2.8
-          - mccabe==0.6.1
-        files: ^src/.+\.py$
+      - id: ruff
+        args:
+          - --fix
 
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.4
+    rev: 1.7.5
     hooks:
       - id: bandit
         args:
@@ -37,8 +30,3 @@ repos:
           - --format=custom
           - --configfile=bandit.yaml
         files: ^(src|example|tests)/.+\.py$
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort

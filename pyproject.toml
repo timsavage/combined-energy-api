@@ -35,7 +35,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.8"
 aiohttp = "*"
-pydantic = "*"
+pydantic = "^2.5"
 
 [tool.poetry.dev-dependencies]
 aresponses = "*"

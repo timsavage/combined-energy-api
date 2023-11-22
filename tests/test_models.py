@@ -1,9 +1,8 @@
 from datetime import datetime
 from unittest.mock import Mock
 
-import pytest
-
 from combined_energy import models
+import pytest
 
 
 class TestLogin:
@@ -68,7 +67,7 @@ class TestDeviceReadingsWaterHeater:
             s4=[16.5, 55.8],
             s5=[16.5, 60.3],
             s6=[16.5, 68.9],
-            whStatus=["", ""],
+            whStatus=[None, None],
         )
 
     @pytest.fixture

@@ -10,7 +10,6 @@ import socket
 
 from aiohttp import ClientError, ClientResponseError, ClientSession
 from aiohttp.hdrs import METH_GET, METH_POST
-import async_timeout
 
 from . import exceptions
 from .constants import LOGGER
@@ -77,7 +76,7 @@ class CombinedEnergy:
             )
 
         try:
-            async with async_timeout.timeout(request_timeout or self.request_timeout):
+            async with asyncio.timeout(request_timeout or self.request_timeout):
                 response = await self.session.request(
                     method, url, params=params, headers=headers, data=data
                 )
@@ -138,7 +137,7 @@ class CombinedEnergy:
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/user",
         )
-        return CurrentUser.parse_obj(data)
+        return CurrentUser.model_validate(data)
 
     async def installation(
         self,
@@ -148,7 +147,7 @@ class CombinedEnergy:
             DATA_ACCESS_HOST + "/dataAccess/installation",
             i=self.installation_id,
         )
-        return Installation.parse_obj(data)
+        return Installation.model_validate(data)
 
     async def installation_customers(
         self,
@@ -158,7 +157,7 @@ class CombinedEnergy:
             DATA_ACCESS_HOST + "/dataAccess/inst-customers",
             i=self.installation_id,
         )
-        return InstallationCustomers.parse_obj(data)
+        return InstallationCustomers.model_validate(data)
 
     async def readings(
         self,
@@ -166,8 +165,7 @@ class CombinedEnergy:
         range_end: datetime.datetime | None,
         increment: int,
     ) -> Readings:
-        """
-        Get readings from system.
+        """Get readings from system.
 
         :param range_start: Start of readings range
         :param range_end: End of readings range
@@ -180,7 +178,7 @@ class CombinedEnergy:
             rangeEnd=int(range_end.timestamp()) if range_end else "",
             seconds=increment,
         )
-        readings = Readings.parse_obj(data)
+        readings = Readings.model_validate(data)
 
         return readings
 
@@ -192,8 +190,7 @@ class CombinedEnergy:
         *,
         increment: int,
     ):
-        """
-        Get readings for the last delta range.
+        """Get readings for the last delta range.
 
         :param hours: Delta in hours
         :param minutes: Delta in minutes
@@ -215,7 +212,7 @@ class CombinedEnergy:
             DATA_ACCESS_HOST + "/dataAccess/comm-stat",
             i=self.installation_id,
         )
-        return ConnectionStatus.parse_obj(data)
+        return ConnectionStatus.model_validate(data)
 
     async def communication_history(self) -> ConnectionHistory:
         """Get communication history of the installation."""
@@ -223,7 +220,7 @@ class CombinedEnergy:
             DATA_ACCESS_HOST + "/dataAccess/comm-hist",
             i=self.installation_id,
         )
-        return ConnectionHistory.parse_obj(data)
+        return ConnectionHistory.model_validate(data)
 
     async def login(self) -> Login:
         """Login and obtain a web token."""
@@ -238,7 +235,7 @@ class CombinedEnergy:
         )
         if data.get("status") != "ok":
             raise exceptions.CombinedEnergyAuthError(data.get("error", "Login failed"))
-        return Login.parse_obj(data)
+        return Login.model_validate(data)
 
     async def start_log_session(self) -> bool:
         """Trigger the start of a log session (required if readings stop being supplied)."""

@@ -2,6 +2,17 @@
 
 Provides an async Python 3.8+ interface for the http://combined.energy/ monitoring platform API.
 
+<p align="center">
+
+[![Testing](https://github.com/timsavage/combined-energy-api/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/timsavage/combined-energy-api/actions/workflows/tests.yml)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=timsavage_combined-energy-api&metric=coverage)](https://sonarcloud.io/summary/new_code?id=timsavage_combined-energy-api)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=timsavage_combined-energy-api&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=timsavage_combined-energy-api)
+[![PyPI](https://img.shields.io/pypi/v/combined-energy-api?color=green)](https://pypi.org/project/combined-energy-api)
+![PyPI - License](https://img.shields.io/pypi/l/combined-energy-api)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+</p>
+
 > Note this API client is reverse engineered from observing requests being made  
 > in the web-application. Please report any failures to read data, this is likely
 > to occur for readings as I am only able to create entries for devices that I 
@@ -44,7 +55,6 @@ async def main():
             await asyncio.sleep(300)
 
 asyncio.run(main())
-
 ```
 
 

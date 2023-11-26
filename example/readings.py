@@ -1,4 +1,4 @@
-# Example that reads the communication status and fetches readings
+"""Example that reads the communication status and fetches readings."""
 import asyncio
 import datetime
 from datetime import timedelta
@@ -10,14 +10,14 @@ from combined_energy.helpers import ReadingsIterator
 
 
 async def main():
-    """Main entry point."""
+    """Start applicaiton and start featching readings."""
 
     logging.basicConfig(level=logging.DEBUG)
 
     async with CombinedEnergy(
         mobile_or_email=os.getenv("CE_EMAIL", "user@example.com"),
         password=os.getenv("CE_PASSWORD", "PASSWORD"),
-        installation_id=int(os.getenv("CE_INSTALL_ID", 0)),
+        installation_id=int(os.getenv("CE_INSTALL_ID", "0")),
     ) as api:
         com_stat = await api.communication_status()
         print(com_stat)

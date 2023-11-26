@@ -4,9 +4,6 @@ from unittest.mock import AsyncMock
 
 import aresponses
 from aresponses import ResponsesMockServer
-import pytest
-from yarl import URL
-
 from combined_energy import client
 from combined_energy.models import (
     DeviceReadingsCombiner,
@@ -16,6 +13,8 @@ from combined_energy.models import (
     DeviceReadingsSolarPV,
     DeviceReadingsWaterHeater,
 )
+import pytest
+from yarl import URL
 
 
 @pytest.fixture
@@ -35,9 +34,7 @@ def mock_route(
     mock_login: bool = True,
     **params: str,
 ):
-    """
-    Generate a mock route from a fixture file
-    """
+    """Generate a mock route from a fixture file."""
     url = URL(url)
 
     if mock_login:

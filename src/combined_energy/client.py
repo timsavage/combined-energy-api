@@ -8,6 +8,12 @@ from importlib import metadata
 import logging
 import socket
 
+try:
+    # Support builtin asyncio timeout in Python 3.9+
+    from asyncio import timeout as aio_timeout
+except ImportError:
+    from async_timeout import timeout as aio_timeout
+
 from aiohttp import ClientError, ClientResponseError, ClientSession
 from aiohttp.hdrs import METH_GET, METH_POST
 
@@ -76,7 +82,7 @@ class CombinedEnergy:
             )
 
         try:
-            async with asyncio.timeout(request_timeout or self.request_timeout):
+            async with aio_timeout(request_timeout or self.request_timeout):
                 response = await self.session.request(
                     method, url, params=params, headers=headers, data=data
                 )

@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "combined-energy-api"
-version = "0.6"
+version = "0.6.1"
 description = "Python interface to the Combined Energy API"
 authors = ["Tim Savage <tim@savage.company>"]
 maintainers = ["Tim Savage <tim@savage.company>"]

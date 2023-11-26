@@ -31,9 +31,10 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 aiohttp = "*"
 pydantic = "^2.5"
+async-timeout = { version = "*", python = "<3.11" }
 
 [tool.poetry.dev-dependencies]
 aresponses = "*"

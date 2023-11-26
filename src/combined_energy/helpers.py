@@ -43,8 +43,7 @@ class ReadingsIterator:
             return now() - self.initial_delta
 
     async def _check_for_log_session_restart(self) -> None:
-        """
-        Check if a start log session message is required.
+        """Check if a start log session message is required.
 
         This is a strange behaviour of this API that requires the client to
         call start new log session. In the dashboard app this is covered up

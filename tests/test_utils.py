@@ -1,6 +1,5 @@
-import pytest
-
 from combined_energy import utils
+import pytest
 
 
 def test_energy_to_power():

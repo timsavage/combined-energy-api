@@ -17,9 +17,8 @@ except ImportError:
         return iterator.__anext__()
 
 
-import pytest
-
 from combined_energy import helpers
+import pytest
 
 
 class TestReadingsIterator:

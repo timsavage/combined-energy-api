@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "combined-energy-api"
-version = "0.6.1"
+version = "0.7"
 description = "Python interface to the Combined Energy API"
 authors = ["Tim Savage <tim@savage.company>"]
 maintainers = ["Tim Savage <tim@savage.company>"]
@@ -33,7 +33,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.10"
 aiohttp = "*"
-pydantic = "^2.0"
+pydantic = "^1.0"
 async-timeout = { version = "*", python = "<3.11" }
 
 [tool.poetry.dev-dependencies]

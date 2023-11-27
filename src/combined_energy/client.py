@@ -143,7 +143,7 @@ class CombinedEnergy:
         data = await self._request(
             DATA_ACCESS_HOST + "/dataAccess/user",
         )
-        return CurrentUser.model_validate(data)
+        return CurrentUser.parse_obj(data)
 
     async def installation(
         self,
@@ -153,7 +153,7 @@ class CombinedEnergy:
             DATA_ACCESS_HOST + "/dataAccess/installation",
             i=self.installation_id,
         )
-        return Installation.model_validate(data)
+        return Installation.parse_obj(data)
 
     async def installation_customers(
         self,
@@ -163,7 +163,7 @@ class CombinedEnergy:
             DATA_ACCESS_HOST + "/dataAccess/inst-customers",
             i=self.installation_id,
         )
-        return InstallationCustomers.model_validate(data)
+        return InstallationCustomers.parse_obj(data)
 
     async def readings(
         self,
@@ -184,7 +184,7 @@ class CombinedEnergy:
             rangeEnd=int(range_end.timestamp()) if range_end else "",
             seconds=increment,
         )
-        readings = Readings.model_validate(data)
+        readings = Readings.parse_obj(data)
 
         return readings
 
@@ -218,7 +218,7 @@ class CombinedEnergy:
             DATA_ACCESS_HOST + "/dataAccess/comm-stat",
             i=self.installation_id,
         )
-        return ConnectionStatus.model_validate(data)
+        return ConnectionStatus.parse_obj(data)
 
     async def communication_history(self) -> ConnectionHistory:
         """Get communication history of the installation."""
@@ -226,7 +226,7 @@ class CombinedEnergy:
             DATA_ACCESS_HOST + "/dataAccess/comm-hist",
             i=self.installation_id,
         )
-        return ConnectionHistory.model_validate(data)
+        return ConnectionHistory.parse_obj(data)
 
     async def login(self) -> Login:
         """Login and obtain a web token."""
@@ -241,7 +241,7 @@ class CombinedEnergy:
         )
         if data.get("status") != "ok":
             raise exceptions.CombinedEnergyAuthError(data.get("error", "Login failed"))
-        return Login.model_validate(data)
+        return Login.parse_obj(data)
 
     async def start_log_session(self) -> bool:
         """Trigger the start of a log session (required if readings stop being supplied)."""

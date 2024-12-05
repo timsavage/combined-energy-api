@@ -1,5 +1,11 @@
+## 0.8.0
+
+- Fix blocking IO fetching metadata during asyncio request (thanks @evilmarty)
+- Drop support for Python 3.10
+- Update dependency versions
+
 ## 0.7.0
-- Revert 
+- Revert
 
 ## _0.6.1_
 

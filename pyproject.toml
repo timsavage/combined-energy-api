@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "combined-energy-api"
-version = "0.7"
+version = "0.8"
 description = "Python interface to the Combined Energy API"
 authors = ["Tim Savage <tim@savage.company>"]
 maintainers = ["Tim Savage <tim@savage.company>"]
@@ -22,8 +22,9 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 packages = [
     { include = "combined_energy", from = "src" },
@@ -31,19 +32,16 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 aiohttp = "*"
 pydantic = "^1.0"
 async-timeout = { version = "*", python = "<3.11" }
 
 [tool.poetry.dev-dependencies]
 aresponses = "*"
-pytest = "^7.0"
+pytest = "^8.0"
 pytest-cov = "*"
-pytest-asyncio = "*"
-
-[tool.black]
-target-version = ["py310", "py311", "py312"]
+pytest-asyncio = "^0.24"
 
 [tool.ruff]
 select = [

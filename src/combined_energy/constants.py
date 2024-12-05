@@ -1,8 +1,11 @@
 """Constants used by API."""
+
 from enum import Enum
+from importlib import metadata
 import logging
 
 LOGGER = logging.getLogger(__package__)
+VERSION = metadata.version("combined-energy-api")
 
 
 class DeviceType(str, Enum):

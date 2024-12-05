@@ -1,10 +1,10 @@
 """Client for API."""
+
 from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
 import datetime
-from importlib import metadata
 import logging
 import socket
 
@@ -18,7 +18,7 @@ from aiohttp import ClientError, ClientResponseError, ClientSession
 from aiohttp.hdrs import METH_GET, METH_POST
 
 from . import exceptions
-from .constants import LOGGER
+from .constants import LOGGER, VERSION
 from .models import (
     ConnectionHistory,
     ConnectionStatus,
@@ -64,10 +64,9 @@ class CombinedEnergy:
         request_timeout: float = None,
     ):
         """Handle a request to the Combined Energy API."""
-        version = metadata.version("combined-energy-api")
         headers = {
             "Accept": accept,
-            "User-Agent": f"PythonCombinedEnergy/{version}",
+            "User-Agent": f"PythonCombinedEnergy/{VERSION}",
         }
 
         if self.session is None:

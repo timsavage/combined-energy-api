@@ -13,9 +13,9 @@ Provides an async Python 3.11+ interface for the http://combined.energy/ monitor
 
 </p>
 
-> Note this API client is reverse engineered from observing requests being made  
+> Note this API client is reverse engineered from observing requests being made
 > in the web-application. Please report any failures to read data, this is likely
-> to occur for readings as I am only able to create entries for devices that I 
+> to occur for readings as I am only able to create entries for devices that I
 > have.
 
 ## Installation
@@ -66,4 +66,4 @@ You will need:
 - poetry
 - pre-commit
 
-Ensure pre-commit is installed into your git repository with `pre-commit install`. 
+Ensure pre-commit is installed into your git repository with `pre-commit install`.

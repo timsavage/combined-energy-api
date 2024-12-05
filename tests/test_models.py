@@ -1,8 +1,9 @@
 from datetime import datetime
 from unittest.mock import Mock
 
-from combined_energy import models
 import pytest
+
+from combined_energy import models
 
 
 class TestLogin:

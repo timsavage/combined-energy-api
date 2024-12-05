@@ -12,7 +12,7 @@ A clear and concise description of what the bug is.
 
 **Additional context**
 Please attach an output of the readings API to do this in Google Chrome:
-1. Login into the Combined Energy monitoring application 
+1. Login into the Combined Energy monitoring application
 2. Open the _Developer Tools_
 3. Select the _Network_ tab
 4. Switch to the _Live View_ in the Combined Energy monitor

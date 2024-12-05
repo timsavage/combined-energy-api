@@ -1,4 +1,5 @@
 """API Schema model."""
+
 from datetime import datetime, timedelta
 from typing import Any, Callable, Literal
 
@@ -407,7 +408,7 @@ class Readings(BaseModel):
 
     @staticmethod
     def _populate_devices(
-        raw_devices: list[dict[str, Any]]
+        raw_devices: list[dict[str, Any]],
     ) -> (list[DeviceReadings], list[dict[str, Any]]):
         """Populate known devices and document unknown.
 

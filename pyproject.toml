@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "combined-energy-api"
-version = "0.7"
+version = "0.8"
 description = "Python interface to the Combined Energy API"
 authors = ["Tim Savage <tim@savage.company>"]
 maintainers = ["Tim Savage <tim@savage.company>"]
@@ -22,8 +22,9 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 packages = [
     { include = "combined_energy", from = "src" },
@@ -31,21 +32,18 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 aiohttp = "*"
 pydantic = "^1.0"
 async-timeout = { version = "*", python = "<3.11" }
 
 [tool.poetry.dev-dependencies]
 aresponses = "*"
-pytest = "^7.0"
+pytest = "^8.0"
 pytest-cov = "*"
-pytest-asyncio = "*"
+pytest-asyncio = "^0.24"
 
-[tool.black]
-target-version = ["py38", "py39", "py310"]
-
-[tool.ruff]
+[tool.ruff.lint]
 select = [
     "B002", # Python does not support the unary prefix increment
     "B007", # Loop control variable {name} not used within loop body
@@ -66,7 +64,6 @@ select = [
     "N804", # First argument of a class method should be named cls
     "N805", # First argument of a method should be named self
     "N815", # Variable {name} in class scope should not be mixedCase
-    "PGH001", # No builtin eval() allowed
     "PGH004",  # Use specific rule codes when using noqa
     "PLC0414", # Useless import alias. Import alias does not rename original package.
     "PLC", # pylint
@@ -105,7 +102,7 @@ select = [
     "T20",  # flake8-print
     # "TID251", # Banned imports
     "TRY004", # Prefer TypeError exception for invalid type
-    "TRY200", # Use raise from to specify exception cause
+    "B904", # Use raise from to specify exception cause
     "TRY302", # Remove exception handler; error is immediately re-raised
     "UP",  # pyupgrade
     "W",  # pycodestyle

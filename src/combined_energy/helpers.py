@@ -1,8 +1,9 @@
 """Helpers for using the API client."""
+
 from collections import deque
 from datetime import datetime, timedelta
 import logging
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator
 
 from .client import CombinedEnergy
 from .models import Readings
@@ -30,12 +31,12 @@ class ReadingsIterator:
         self.increment = increment
         self.initial_delta = initial_delta
 
-        self._last_end: Optional[datetime] = None
+        self._last_end: datetime | None = None
         # Prefill with False
         self._empty = deque([False] * log_session_reset_count, log_session_reset_count)
 
     @property
-    def next_range_start(self) -> Optional[datetime]:
+    def next_range_start(self) -> datetime | None:
         """Calculate the next range start value."""
         if self._last_end:
             return self._last_end

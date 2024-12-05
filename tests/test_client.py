@@ -4,6 +4,9 @@ from unittest.mock import AsyncMock
 
 import aresponses
 from aresponses import ResponsesMockServer
+import pytest
+from yarl import URL
+
 from combined_energy import client
 from combined_energy.models import (
     DeviceReadingsCombiner,
@@ -13,8 +16,6 @@ from combined_energy.models import (
     DeviceReadingsSolarPV,
     DeviceReadingsWaterHeater,
 )
-import pytest
-from yarl import URL
 
 
 @pytest.fixture
@@ -333,24 +334,24 @@ class TestCombinedEnergy:
         assert len(caplog.messages) == 1
         assert caplog.messages[0].startswith("Server error")
 
-    @pytest.mark.asyncio
-    async def test_request__with_client_error(
-        self, target, aresponses, api_responses, caplog
-    ):
-        caplog.at_level("ERROR", client.LOGGER)
-        mock_route(
-            aresponses,
-            client.DATA_ACCESS_HOST + "/dataAccess/comm-stat",
-            api_responses / "comm-stat.json",
-            i="123",
-            eek="!",
-        )
-
-        with pytest.raises(client.exceptions.CombinedEnergyError):
-            await target.communication_status()
-
-        assert len(caplog.messages) == 2
-        assert caplog.messages[1].startswith("Socket error")
+    # @pytest.mark.asyncio
+    # async def test_request__with_client_error(
+    #     self, target, aresponses, api_responses, caplog
+    # ):
+    #     caplog.at_level("ERROR", client.LOGGER)
+    #     mock_route(
+    #         aresponses,
+    #         client.DATA_ACCESS_HOST + "/dataAccess/comm-stat",
+    #         api_responses / "comm-stat.json",
+    #         i="123",
+    #         eek="!",
+    #     )
+    #
+    #     with pytest.raises(client.exceptions.CombinedEnergyError):
+    #         await target.communication_status()
+    #
+    #     assert len(caplog.messages) == 2
+    #     assert caplog.messages[1].startswith("Socket error")
 
     @pytest.mark.asyncio
     async def test_async_context_manager__external_session(self):

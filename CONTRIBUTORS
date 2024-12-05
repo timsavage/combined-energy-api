@@ -1,2 +1,3 @@
 @timsavage - Package author
+@evilmarty - Blocking IO call during asyncio address
 @matts on Home Assistant Forum - Sample output from API, testing and feedback

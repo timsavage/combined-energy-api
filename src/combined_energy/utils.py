@@ -1,4 +1,5 @@
 """Utility methods."""
+
 from typing import Final
 
 KWH_TO_KW: Final[float] = 3.6

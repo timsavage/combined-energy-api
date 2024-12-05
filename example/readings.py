@@ -1,4 +1,5 @@
 """Example that reads the communication status and fetches readings."""
+
 import asyncio
 import datetime
 from datetime import timedelta

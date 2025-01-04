@@ -46,17 +46,17 @@ class CombinedEnergy:
     session: ClientSession | None = None
     _close_session: bool = False
     _jwt: str | None = None
-    _expires: datetime | None = None
+    _expires: datetime.datetime | None = None
 
     async def _make_request(
         self,
         url: str,
-        params: dict[str, str] = None,
-        data: dict[str, str] = None,
+        params: dict[str, str] | None = None,
+        data: dict[str, str] | None = None,
         *,
         method: str = METH_GET,
         accept: str = "application/json",
-        request_timeout: float = None,
+        request_timeout: float | None = None,
     ):
         """Handle a request to the Combined Energy API."""
         headers = {

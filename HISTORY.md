@@ -1,3 +1,8 @@
+## 1.0.0
+
+- Reintroduce pydantic 2 (not that it is the default in Home Assistant).
+- Bump to a major release as pydantic 2 is a breaking change.
+
 ## 0.8.0
 
 - Fix blocking IO fetching metadata during asyncio request (thanks @evilmarty)

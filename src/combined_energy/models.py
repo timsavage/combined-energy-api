@@ -333,7 +333,9 @@ class DeviceReadingsWaterHeater(DeviceReadingsGenericConsumer):
     temp_sensor4: None | list[None | float] = Field(alias="s4")
     temp_sensor5: None | list[None | float] = Field(alias="s5")
     temp_sensor6: None | list[None | float] = Field(alias="s6")
-    water_heater_status: None | list[None | dict[str, Any]] = Field(alias="whStatus")
+    water_heater_status: None | list[None | dict[str, Any]] = Field(
+        alias="whStatus", default=None
+    )
 
     def __str__(self):
         """Convert instance to string."""

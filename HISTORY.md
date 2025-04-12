@@ -1,3 +1,7 @@
+## 1.0.1
+
+- Make whStatus optional due to a change in the API.
+
 ## 1.0.0
 
 - Reintroduce pydantic 2 (not that it is the default in Home Assistant).
